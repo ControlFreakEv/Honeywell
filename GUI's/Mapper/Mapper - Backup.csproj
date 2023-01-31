@@ -1,0 +1,96 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>map.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="map.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="automaticgraphlayout.graphviewergdi" Version="1.1.12" />
+    <PackageReference Include="DG.AdvancedDataGridView" Version="1.2.27307.7" />
+    <PackageReference Include="DockPanelSuite" Version="3.1.0" />
+    <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.0" />
+    <PackageReference Include="fernandreu.ScintillaNET" Version="4.2.0" />
+    <PackageReference Include="NPOI" Version="2.5.6" />
+    <PackageReference Include="ScintillaNET_FindReplaceDialog-huanlin" Version="1.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\Database\Database.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Forms\Panes\ConfigTemplateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\BulkEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\Panes\CLViewerForm.cs" />
+    <Compile Update="Forms\Panes\CrossCommsDgvForm.cs" />
+    <Compile Update="Forms\Panes\CLAllDgvForm.cs" />
+    <Compile Update="Forms\BulkBuildForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\Panes\TagConnectionsDgvForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\Panes\FileRefsDgvForm.cs" />
+    <Compile Update="Forms\Panes\TagsInCLDgvForm.cs" />
+    <Compile Update="Forms\Tools\TdcToExperionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\Tools\TemplatesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\Panes\ModuleDgvForm.cs" />
+    <Compile Update="Forms\Panes\TagsOnMapDgvForm.cs" />
+    <Compile Update="Forms\Panes\ParameterDgvForm.cs" />
+    <Compile Update="Forms\Panes\CLOnTagDgvForm.cs" />
+    <Compile Update="Forms\Panes\GraphForm.cs" />
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Mapper Manual.docx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="TDC Function Tooltips.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Forms\Help\" />
+    <Folder Include="Forms\View\" />
+  </ItemGroup>
+
+</Project>

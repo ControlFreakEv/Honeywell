@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Honeywell.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <Copyright>Ⓒ 2023 Evan Brooks Miller, All rights reserved</Copyright>
+  </PropertyGroup>
+
+</Project>

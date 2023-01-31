@@ -1,0 +1,87 @@
+﻿<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="richTextBox1.Text" xml:space="preserve">
+    <value>-fill out available file/folder paths (blank out if not used)
+-eb folder path: folder containing eb files
+-cl folder path: folder containing cl files
+-js folder path: folder containing js files (for tdc2000)
+-custom connections: can leave this blanked out. Allows you to add custom parameter connections between tags. Useful for TDC2000
+-CL slots: CLSLOTS.ZB from d3k. Used to determine which tdc tag is attached to certain AM points
+-D3K file path: will suck out FFL/Schematic/group references and add to database
+-CDS file path: don't worry about this. This was a temp fix for a bad EB export
+-HG IO without tags: can leave this blanked out. Allows you to create custom TDC tags. Useful for TDC2000
+-Parse Tags: 
+	-if "Generate Maps" is checked, then it will create a sqllite DB with a wealth of info. Copy "TDC.DB", "TDC.DB-SHM", and "TDC.DB-WAL" into folder containing "Mapper.exe"
+	-if "Generate Maps" is not checked, will export spreadsheet containing Tag/module/parameter info (can also get all this info from mapper DB)
+	-if "search sub directories" is checked, it will search files eb/cl/js in subfolders of the parent folder
+	-uses the following file folder paths if not blanked out
+		-EB
+		-CL
+		-JS
+		-custom connections
+		-CL slots
+		-D3k file path
+-Parse Groups: will export a spreadsheet of group info from EB files
+-Create EBs: will generate a single EB file from the following files 
+	-D3K file path
+	-CDS file path
+	-HG IO without tags file</value>
+  </data>
+</root>
