@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Data;
 using System.Text;
@@ -10,15 +10,10 @@ using System.Linq;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.SS.Util;
-using SixLabors.Fonts.Tables.AdvancedTypographic;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Drawing;
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Forms;
-using Org.BouncyCastle.Crypto.Parameters;
-using NPOI.POIFS.Crypt;
 //using ExperionGfx;
-using NPOI.HPSF;
 using System.Diagnostics;
 //using NPOI.SS.Formula.Functions;
 

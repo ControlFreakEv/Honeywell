@@ -66,7 +66,9 @@ namespace Honeywell.GUI.Mapper
         /// set this true to show circular buttons for code folding (the [+] and [-] buttons on the margin)
         /// </summary>
         private const bool CODEFOLDING_CIRCULAR = false;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public CLLexer Lexer { get; set; } = new();
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string? PackageAttachment { get; set; }
         DbTdcCL dbTdcCL;
         #endregion
@@ -223,7 +225,7 @@ namespace Honeywell.GUI.Mapper
         private void InitColors()
         {
             ScintillaTextEditorCL.CaretForeColor = Color.White;
-            ScintillaTextEditorCL.SetSelectionBackColor(true, IntToMediaColor(0x114D9C));
+            ScintillaTextEditorCL.SelectionBackColor = IntToMediaColor(0x114D9C);
 
             //FindReplace.Indicator.ForeColor = System.Drawing.Color.DarkOrange;
         }
@@ -274,7 +276,7 @@ namespace Honeywell.GUI.Mapper
             ScintillaTextEditorCL.Indicators[CLLexer.Function].Style = IndicatorStyle.Dots;
             ScintillaTextEditorCL.Indicators[CLLexer.Function].ForeColor = Color.White;
 
-            ScintillaTextEditorCL.Lexer = ScintillaNET.Lexer.Container;
+            ScintillaTextEditorCL.LexerName = string.Empty; // no built-in lexer: container lexing via StyleNeeded
         }
 
         /// <summary>

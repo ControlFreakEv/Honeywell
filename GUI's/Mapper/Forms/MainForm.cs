@@ -1,4 +1,4 @@
-using Microsoft.Msagl.Drawing;
+﻿using Microsoft.Msagl.Drawing;
 using WeifenLuo.WinFormsUI.Docking;
 using Honeywell.Database;
 using Honeywell.GUI.Mapper.ScintillaExt;
@@ -33,6 +33,7 @@ namespace Honeywell.GUI.Mapper
         public FileRefsDgvForm MainFileRefsDgvForm = new();
         public TagConnectionsDgvForm MainTagConnectionsDgvForm = new();
 
+        [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public bool SaveNodesEnabled { get; set; }
 
         DbTdcTag? primaryTagName = null;

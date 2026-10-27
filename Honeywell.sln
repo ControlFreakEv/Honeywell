@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TDC Parser", "GUI's\TDC Par
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experion GFX Parser", "GUI's\Experion GFX Parser\Experion GFX Parser.csproj", "{F59B466D-3CCA-4FCC-B9D6-771194A55BD7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScintillaNET_FindReplaceDialog", "Libraries\ScintillaNET_FindReplaceDialog\ScintillaNET_FindReplaceDialog.csproj", "{F3653CDD-5681-49AE-A989-5424613C17AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -161,6 +163,18 @@ Global
 		{F59B466D-3CCA-4FCC-B9D6-771194A55BD7}.Release|x64.Build.0 = Release|Any CPU
 		{F59B466D-3CCA-4FCC-B9D6-771194A55BD7}.Release|x86.ActiveCfg = Release|Any CPU
 		{F59B466D-3CCA-4FCC-B9D6-771194A55BD7}.Release|x86.Build.0 = Release|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Debug|x64.Build.0 = Debug|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Debug|x86.Build.0 = Debug|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Release|x64.ActiveCfg = Release|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Release|x64.Build.0 = Release|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Release|x86.ActiveCfg = Release|Any CPU
+		{F3653CDD-5681-49AE-A989-5424613C17AA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,6 +190,7 @@ Global
 		{11F05CE0-0088-4FBD-94FB-754CDF3F4DCB} = {DD7AD958-CF08-4B6D-9C27-7DA8E0E09081}
 		{5BB670D8-7AA1-4072-8422-CD82EB08789D} = {A54FCF74-C1D3-401C-8C49-181220EEF521}
 		{F59B466D-3CCA-4FCC-B9D6-771194A55BD7} = {A54FCF74-C1D3-401C-8C49-181220EEF521}
+		{F3653CDD-5681-49AE-A989-5424613C17AA} = {B20496F3-634E-4134-8C21-DCACDD71242A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D861E496-7902-443A-8A98-21B55CF7A905}

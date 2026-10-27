@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -16,12 +16,11 @@
 
   <ItemGroup>
     <PackageReference Include="automaticgraphlayout.graphviewergdi" Version="1.1.12" />
-    <PackageReference Include="DG.AdvancedDataGridView" Version="1.2.27307.7" />
-    <PackageReference Include="DockPanelSuite" Version="3.1.0" />
-    <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.0" />
-    <PackageReference Include="fernandreu.ScintillaNET" Version="4.2.0" />
-    <PackageReference Include="NPOI" Version="2.5.6" />
-    <PackageReference Include="ScintillaNET_FindReplaceDialog-huanlin" Version="1.5.2" />
+    <PackageReference Include="DG.AdvancedDataGridView" Version="1.2.32219.20" />
+    <PackageReference Include="DockPanelSuite" Version="3.1.1" />
+    <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.1" />
+    <PackageReference Include="Scintilla5.NET" Version="7.1.1" />
+    <PackageReference Include="NPOI" Version="2.8.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -107,6 +106,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Models\Database\Database.csproj" />
+    <ProjectReference Include="..\..\Libraries\ScintillaNET_FindReplaceDialog\ScintillaNET_FindReplaceDialog.csproj" />
   </ItemGroup>
 
 </Project>

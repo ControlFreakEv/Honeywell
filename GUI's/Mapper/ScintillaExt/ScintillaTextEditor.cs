@@ -31,6 +31,7 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
 
         #region Properties
 
+        [DefaultValue(true)]
         public bool ShowLineMargin
         {
             get { return this.showLineMargin; }
