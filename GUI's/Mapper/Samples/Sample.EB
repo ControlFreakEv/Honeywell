@@ -1,0 +1,11 @@
+﻿&T REGAM                                                                        
+&N SampleRegam                                                                     
+PKGNAME(1) ="Sample "
+
+{SYSTEM ENTITY SampleDICMPNIM( )                                                      }
+&T DICMPNIM                                                                     
+&N SampleDICMPNIM                                                                      
+
+{SYSTEM ENTITY BLL5129B( )                                                     }
+&T DIINNIM                                                                      
+&N SampleDIINNIM                                                                     

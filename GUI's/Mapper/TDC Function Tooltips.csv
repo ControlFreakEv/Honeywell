@@ -1,0 +1,1593 @@
+﻿function,desc,arguments
+Abs,"Abs (x) -- absolute value  where x, is number. Returns a number.",TRUE
+Allow_Bad," 
+Allow_Bad (x, y) 
+This subroutine stores the value of y into the numeric variable x.  If x is a parameter of 
+a data point and y is a bad value, the store proceeds without error.  Note that if a SET 
+statement had been used, an attempt to store a bad value into a parameter of a data 
+point would constitute a runtime error; the store would not be completed and the 
+program would abort. 
+ 
+Note that if y is a bad value and you attempt to store it into an integer parameter x, a 
+runtime error occurs and the store is not completed even if Allow_Bad is used.   
+ 
+Note also, that use of an equivalence statement instead of a comma—e.g.,  
+Allow_Bad (x=y)—results in the compiler error message ""Internal Error, Save 
+source and call Honeywell.""  If this occurs, just fix the syntax error and recompile.",TRUE
+Atan,"Atan (x)  -- arc tangent  where x, is number. Returns a number.",TRUE
+Avg,"Avg (x, y, ...) -- average  where x, is number. Returns a number.
+Avg (x) -- average where x is an array. Returns a number.",TRUE
+BKG_Change_Priority,"BKG_Change_Priority (p) 
+This subroutine permits background CL programs to vary their priority (where p is a 
+$BKGPRTY enumeration value of LOW, MEDIUM, or HIGH).  Background CL 
+programs always start at HIGH priority; however, this priority is lower than all other 
+tasks in the AM (i.e., lower than checkpointing, point building, and CL linking). 
+ 
+By changing the priority of a Background CL Block while it is running to HIGH, that 
+block—once initiated—will run from beginning to end without being interrupted by 
+another background task set to MEDIUM or LOW priority.  The background 
+executive resets the background priority to HIGH on entry and exit of the CL. 
+ 
+If the CL block is already at the priority being requested, there is no error.  
+BKG_Change_Priority aborts the CL on these errors: 
+1) request to set priority is not successful (error1) 
+2) request value is not LOW, MEDIUM, or HIGH (range) ",TRUE
+BKG_Delay,"BKG_Delay (t) 
+This subroutine sets a delay time, in seconds, for a Background CL Block.  The 
+minimum delay interval is zero; the maximum is one hour.  A zero delay length causes 
+the Background CL Block to stop running for as short a time as the system will allow. 
+ 
+A CL abort check is performed at 5 second intervals during the delay.  BKG_Delay 
+aborts the CL for these reasons: 
+1) the delay time is greater than one hour (range). 
+2) system delay error (error1). 
+3) operator abort (abort). ",TRUE
+BKG_Switchover_Restart,"This function is used to detect switchover and program restart in the backup AM.  If 
+CL is running on a point when a failure of the primary AM occurs, the point's CLs are 
+re-queued (restarted) in the backup.  BKG_Switchover_Restart returns an ON value 
+only if called during the first execution of a CL block following switchover.  
+Background CLs can use this function as part of a failover detection and recovery 
+process.  If, under normal running of an application, information on the state of the 
+process has been recorded in CDS parameters, the program can use this information to 
+recover and restart processing appropriately.  For more information about background 
+CL in redundant AMs, refer to subsection 7.4 in Application Module Implementation 
+Guidelines.",FALSE
+CDS_Read,"CDS_Read (s, fm, p, n) 
+This subroutine reads a Custom Data Segment (CDS) from a History Module or removable 
+mediafile (see CDS_Write) and overwrites an existing CDS on the Bound Data Point.  It can only be called by a Background CL Block.   
+Where: “s” will contain the return status of the read request 
+ “fm” will contain additional status information for some failure types (see C.2.4   
+ for removable media or remote LCN path identification) 
+ “p” is the full pathname of the file from which the CDS values will be read  (must 
+be uppercase) 
+ “n” is the name of a CDS on the Bound Data Point (must be uppercase) 
+ 
+This subroutine can overlay an existing CDS only when the structure of the source (stored) CDS and 
+destination (existing) CDS match.  This means that both CDS must have the same number of 
+parameters and the data type of each parameter must match.  Values in the parameters and names of 
+the parameters can differ between the two CDS.  If the CDS structures do not match, CDS_Read will 
+not overlay values in the existing CDS and will return a status value of MISMATCH. 
+ 
+The only status values to be expected (for a complete listing see heading 4.11) are: 
+ OK = successful read of CDS values 
+ BADPATH = an invalid file path was specified 
+ BADFILE = the specified file does not contain a CDS 
+ MISMATCH = structures of the existing and file CDS do not match 
+ NOCDS = the specified CDS does not exist 
+ FMNOFIL = the specified file does not exist 
+ FMHARD = the device on which the file is located reported a physical error condition 
+ FMNOVOL = the specified volume does not exist 
+ FMMOUNT = the specified volume is not mounted 
+ FMOTHER = another type of File Manager error has occurred; the “fm” status 
+argument contains a supplemental status code 
+ 
+“fm” Status Information—There are several problems that the file manager can encounter that 
+are caused by incorrect system configuration or by failures in system hardware or software.  
+When one of these occurs, the “s” status value is set to FMOTHER and the “fm” status will 
+contain a File Manager status number (see heading 4.10). ",TRUE
+CDS_Write,"CDS_Write (s, fm, p, n, o) 
+This subroutine writes an existing Custom Data Segment (CDS) to a History Module 
+or removable media file.  It can only be called by a Background CL Block. Where: “s” will contain the return status of the write request 
+ 
+ “fm” will contain additional status information for some failure types 
+ “p” is the full pathname of the file to which the CDS will be written (see 
+C.2.4) 
+ “n” is the name of a CDS on the Bound Data Point (must be upper case) 
+ “o” indicates whether the file should be overwritten if it already exists 
+ 
+The CDS_Write subroutine allows the contents of an existing Custom Data Segment 
+(CDS) to be stored in a file.  The CDS can subsequently be written over the original 
+CDS or any in the AM of identical structure (see the CDS_Read routine). 
+ 
+The only status values to be expected (for a complete listing see heading 4.11) are: 
+ OK = successful store of CDS values 
+ BADPATH = an invalid file path was specified 
+ NOCDS = the specified CDS does not exist 
+ CORRUPT = write of the CDS failed after the initial record was written to the 
+file  The file exists, but it does not contain a complete CDS.  
+Reading this file to a CDS will cause indeterminate results. 
+ FMEXIST = the file already exists and the Overwrite option was not specified 
+ FMNOFIL = the specified file does not exist 
+ FMHARD = the device on which the file is located reported a physical error 
+condition 
+ FMFILES = no more files can be created on the specified volume 
+ FMNOVOL = the specified volume does not exist 
+ FMMOUNT = the specified volume is not mounted 
+ FMVFULL = there is no more room on the specified volume 
+ FMOTHER = another type of File Manager error has occurred; the “fm” status 
+argument contains a supplemental status code 
+ 
+“fm” Status Information—There are several problems that the file manager can 
+encounter that are caused by incorrect system configuration or by failures in system 
+hardware or software.  When one of these occurs, the “s” status value is set to 
+FMOTHER and the “fm” status will contain a File Manager status number (see 
+heading 4.10). ",TRUE
+Comm_Error,"Comm_Error (x) 
+Comm_Error accepts an argument that is an unsubscripted data point/parameter 
+reference of any data type.  It returns ON if there is a communications error when this 
+parameter is prefetched, OFF otherwise.  The data point may be on-LCN or off-LCN.  
+If the data point is one that is not subject to prefetch, a communications error cannot 
+happen and this function always returns OFF. 
+ 
+This function is required for safe access to non-numeric parameters. 
+ 
+The requirement for an unsubscripted reference means that you cannot use 
+Comm_Error to test an element of a point's array parameter.  Use Comm Error on the 
+entire parameter rather than just one element.  For example, Comm_Error(A100.x(3)) 
+is wrong, but Comm_Error(A100.x) can be used in its place. 
+ 
+Note:  HG boxes placed in TEST control mode return Comm_Error ON when the 
+parameter requested is HG box resident (for example, MODE).  Otherwise, TEST 
+control mode returns Comm_Error OFF when the parameter is HG resident (for 
+example, PTEXECST). ",TRUE
+Cos,"Cos (x) -- cosine  where x, is number. Returns a number.",TRUE
+Date_Time,"Date_Time returns the absolute TotalPlant Solution (TPS) System date/time; that is, 
+seconds since 
+midnight of 1 Jan 1979",FALSE
+Delete_File,"Delete_File (s, fm, p) 
+This subroutine deletes the named History Module file (unless the file is protected).  It 
+can only be called by a Background CL Block. 
+ 
+Where: “s” will contain the return status of the read request 
+ 
+ “fm” will contain additional status information for some failure types 
+ 
+ “p” is the full pathname of the file to be deleted (must be uppercase) 
+ 
+The only status values to be expected (for a complete listing see heading 4.11) are: 
+ OK = successful file deletion 
+ BADPATH = an invalid file path was specified 
+ FMNOFIL = the specified file does not exist 
+ FMHARD = the device on which the file is located reported a physical error 
+condition 
+ FMNOVOL = the specified volume does not exist 
+ FMMOUNT = the specified volume is not mounted 
+ FMOTHER = another type of File Manager error has occurred; the “fm” status 
+argument contains a supplemental status code 
+ 
+“fm” Status Information—There are several problems that the file manager can 
+encounter that are caused by incorrect system configuration or by failures in system 
+hardware or software.  When one of these occurs, the “s” status value is set to 
+FMOTHER and the “fm” status will contain a File Manager status number (see 
+heading 4.10 for interpretations). ",TRUE
+Enum_Value_Store,"Enum_Value_Store (e, o, s) 
+This subroutine takes a real number as input, converts it to integer, stores that value as 
+the state of an enumeration or SDE and returns a success/fail status value.   
+ 
+Where: “e” is a reference to a standard enumeration, or custom enumeration, or self-defining
+enumeration (the enumeration can be a CL LOCAL variable, a 
+parameter on the Bound Data Point, or a parameter on another point) to be 
+stored to. 
+ 
+ “o” is a NUMBER value that represents the desired ordinal state of the 
+referenced enumeration (where zero is the first enumeration state). 
+ 
+ “s” is a CLERRSTS enumeration value expressing return status. 
+ 
+Off-node store requests initiated from Background CL Blocks take place immediately; 
+Off-node store requests from Foreground Blocks take place at the end of point 
+processing. 
+ 
+The CL will have an abnormal status return for any of these reasons: 
+1) Reference is not to an enumeration or self-defining enumeration (cnferr). 
+2) Reference specifies a whole array (cnferr). 
+3) Cannot store enumeration to the referenced point.parameter (error type is data 
+owner dependent). 
+4) CL LOCAL store value out of range (cnferr) ",TRUE
+Equal_Null_Point_id,"Equal_Null_Point_id (p) 
+This function determines if a parameter of type point_id is an LCN null point identifier 
+(the value being compared can be either a single CDS parameter or a subscripted 
+element of an array).  The null identifier may be an on-LCN or an off-LCN identifier It 
+returns ON if the point_id is an LCN null identifier (see heading 2.3.8 for more 
+information on null point identifiers).  It will return OFF for any of the following 
+reasons: 
+1) point_id value is not null. 
+2) cannot access the parameter. 
+3) point_id specifies an entire array. 
+4) point_id is not of type entity_id. ",TRUE
+Equal_Point_id,"Equal_Point_id (p1, p2) 
+This function compares two CDS parameters of type point_id (either value being 
+compared can be a single CDS parameter or a subscripted element of an array).  The 
+points may be on-LCN or off-LCN  It returns ON if the two CDS point_id values are 
+equal (see heading 2.3.4.2 for more information on data point identifiers).  It will 
+return OFF for any of the following reasons: 
+1) point_id values of the arguments are not the same. 
+2) cannot access either parameter. 
+3) either point_id specifies an entire array. 
+4) either point_id is not of type entity_id.",TRUE
+Exists,"Exists (p) 
+This function accepts an argument that is an unsubscripted data point/parameter 
+reference of any data type.  It returns ON if the data point and parameter exist.  It 
+returns OFF if either the data point does not exist or the point exists but the parameter 
+does not, or if the Exists check is through a null point identifier, or if a 
+communications error occurs on the Exists call, or if a software inconsistency exists 
+between CL and the data owner (ERROR1).  The data point may be on-LCN or off-LCN.
+ The argument of Exists is restricted in the same way as that of Comm_Error. 
+ 
+Note:  HG boxes placed in TEST control mode return Exists OFF when the parameter 
+requested is HG box resident (for example, MODE).  Otherwise, HG TEST control 
+mode returns Exists ON when the parameter is HG resident (for example, 
+PTEXECST). ",TRUE
+Exp,"Exp (x) -- exponential  where x, is number. Returns a number.",TRUE
+File$Convert_FM_Status,"This routine takes a File Manager status value and returns a string that describes what the status 
+means. 
+ 
+SUBROUTINE File$Convert_FM_Status 
+   (ASCII_File_Manager_Status  : OUT STRING;  -- Status description 
+    File_Manager_Status        : IN  NUMBER;  -- Numeric status code 
+    Status                     : OUT LOGICAL) -- Status code validity  
+ 
+This subroutine can be called from CL blocks linked to any insertion point. 
+ 
+Convert_FM_Status takes a numeric file manager status and returns a string describing the 
+status.  Status is ON if the input is a valid file manager status value, otherwise, status is OFF. ",TRUE
+File$Create_Directory,"This subroutine is used to create a directory on a specified volume on a floppy or cartridge.  
+Each floppy or cartridge can have up to 63 directories. 
+ 
+SUBROUTINE File$Create_Directory 
+   (Return_Status      : OUT NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT NUMBER;  -- File Manager error status 
+    Path               : IN  STRING;  -- Pathname excluding file_name  
+                                      -- and extension 
+    Directory_name     : IN  STRING)  -- New directory's name 
+ 
+The Path parameter must be of this form:  PN:nn>DEV:xxmm>volume_id> 
+ 
+Path identification contents are defined at heading C.2.4; directory name restrictions are 
+explained at heading C.2.9. 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 6.0 — Device error  
+ 12.0 — Other File Manager error 
+ 41.0 — Duplicate volume 
+ 42.0 — Volume not mounted  
+ 43.0 — Duplicate directory 
+ 49.0 — Directory name too long ",TRUE
+File$Create_Volume,"This subroutine is used either to create a volume on an initialized floppy/cartridge, or to both 
+initialize the medium and create a volume on it. 
+ 
+SUBROUTINE File$Create_Volume 
+   (Return_Status      : OUT NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT NUMBER;  -- File Manager error status 
+    Max_Num_Files      : IN  NUMBER;  -- Maximum number of files  
+    Format             : IN  LOGICAL; -- on = format, then initialize; 
+                                      -- off = initialize only 
+    Mem_Dir_Opt        : IN  LOGICAL; -- on  = keep file locators in  
+                                      -- memory; off = do not keep 
+                                      -- file locators in memory 
+    Volume_id          : IN  STRING;  -- 20-character volume identifier 
+    Path               : IN  STRING)  -- Pathname excluding file_name  
+                                      -- and extension 
+ 
+The Max_Num_Files parameter specifies the maximum number of files that can be created on 
+this volume (the minimum is 26).  A floppy can hold a maximum of 300 files; the cartridge disk 
+limit is 3000X files.  Note that allowing a large number of files has an impact on data space 
+availablity since one sector of housekeeping data is required for each five files. 
+ 
+The up-to-20 character volume identifier string must be left justified (no leading spaces). 
+ 
+The Path parameter must be of this form:  PN:nn>DEV:xxmm>volume_id> 
+ 
+Path identification contents are defined at heading C.2.4 and requirements for the four-character 
+volume_id are explained at heading C.2.9. 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 6.0 — Device error  
+ 12.0 — Other File Manager error 
+ 33.0 — Input value out of range 
+ 42.0 — Volume not mounted",TRUE
+File$Create_Volume_With_Descriptors,"This subroutine can be used to create a volume with descriptors on an initialized removable 
+media, or to both initialize the media and create a volume with descriptors.  It  has the same 
+function as the File$Create_Volume subroutine plus provides for descriptors in each directory 
+and file of the volume. 
+ 
+SUBROUTINE File$Create_Volume_With_Descriptors 
+   (Return_Status      : OUT NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT NUMBER;  -- File Manager error status 
+    Max_Num_Files      : IN  NUMBER;  -- Maximum number of files  
+    Format             : IN  LOGICAL; -- on = format, then initialize; 
+                                      -- off = initialize only 
+    Mem_Dir_Opt        : IN  LOGICAL; -- on  = keep file locators in  
+                                      -- memory; off = do not keep 
+                                      -- file locators in memory 
+    Volume_id          : IN  STRING;  -- 20-character volume identifier 
+    Path               : IN  STRING)  -- Pathname excluding file_name  
+                                      -- and extension 
+ 
+The Max_Num_Files parameter specifies the maximum number of files that can be created on 
+this volume (the minimum is 26).  A floppy can hold a maximum of 300 files; the cartridge disk 
+limit is 3000X files.  Note that allowing a large number of files has an impact on data space 
+availablity since one sector of housekeeping data is required for each five files.  With 
+descriptors, an additional (((Max_Num_Files + 63) * 64)/256) sectors are required. 
+ 
+A double-sided, double density diskette contains 4004 sectors.  The maximum number of files 
+allowed on the volume will be at least as many as specified.  It may be a few more. 
+ 
+The up-to-20 character volume identifier string must be left justified (no leading spaces). 
+ 
+The Path parameter must be of this form:  PN:nn>DEV:xxmm>volume_id> 
+ 
+Path identification contents are defined at heading C.2.4 and requirements for the four-character 
+volume_id are explained at heading C.2.9. 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 6.0 — Device error  
+ 12.0 — Other File Manager error 
+ 33.0 — Input value out of range 
+ 42.0 — Volume not mounted  ",TRUE
+File$Delete_Directory,"This subroutine is used to delete the specified directory from a specified volume on a floppy or 
+cartridge. 
+ 
+SUBROUTINE File$Delete_Directory 
+   (Return_Status      : OUT NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT NUMBER;  -- File Manager error status 
+    Path               : IN  STRING;  -- Pathname excluding file_name  
+                                      -- and extension 
+    Directory_name     : IN  STRING)  -- Directory name 
+ 
+The Path parameter must be of this form:  PN:nn>DEV:xxmm>volume_id> 
+ 
+Path identification contents are defined at heading C.2.4; directory name restrictions are 
+explained at heading C.2.9. 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 6.0 — Device error  
+ 12.0 — Other File Manager error 
+ 41.0 — Duplicate volume 
+ 42.0 — Volume not mounted  
+ 44.0 — Directory not found 
+ 45.0 — Directory not empty 
+ 49.0 — Directory name too long",TRUE
+File$Delete_File,"This subroutine is used to delete files either from the History Module or a floppy/cartridge.  The 
+only effective difference between this subroutine and the standard AM subroutine Delete_File is 
+that this subroutine allows access to removable media. 
+ 
+SUBROUTINE File$Delete_File 
+   (Return_Status      : OUT NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT NUMBER;  -- File Manager error status 
+    Path               : IN  STRING)  -- Pathname including file_name  
+                                      -- and extension 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+This subroutine can be used to delete a file on another LCN.  In this case, the file to be deleted 
+must be on a History Module. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 3.0 — File privilege violation 
+ 5.0 — File does not exist 
+ 9.0 — Volume does not exist (or in some cases is not mounted) 
+ 12.0 — Other File Manager error 
+ 28.0 — File already open 
+ 29.0 — File reserved for another operation 
+ 36.0 — Can't access file (due to HM failure, etc.) ",TRUE
+File$Get_File_Attributes," 
+This subroutine gets the file name, extension, file size (for files with fixed length records), and 
+time stamp of any file in a list previously created by File$Read_Directory. 
+ 
+SUBROUTINE File$Get_File_Attributes 
+   (Return_Status      : OUT  NUMBER;  -- File R/W error status 
+    File_Name_and_ext  : OUT  STRING;  -- Filename.extension; 
+    File_Size          : OUT  NUMBER;  -- Number of words used by file 
+    Time_Stamp         : OUT  TIME;    -- File creation date and time 
+    File_Number        : IN   NUMBER;  -- Input slot in list 
+    File_List_Number   : IN   NUMBER)  -- Value returned by preceding 
+                                       -- File$Read_Directory call 
+ 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 20.0 — Can't read file control table pointer 
+ 33.0 — Input value (file number) out of range 
+ 48.0 — File list number is invalid ",TRUE
+File$Get_File_Descriptor,"This subroutine gets the descriptor of any file in a list previously created by 
+File$Read_Directory. 
+ 
+SUBROUTINE File$Get_File_Descriptor 
+   (Return_Status      : OUT    NUMBER;  -- File R/W error status 
+    File_Descriptor    : OUT    STRING;  -- 64-character descriptor 
+    File_Number        : IN     NUMBER;  -- Input slot in list 
+    File_List_Number   : IN     NUMBER)  -- value returned by preceding 
+                                         -- File$Read_Directory call 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+The descriptor value is 64 characters long. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 20.0 — Can't read file control table pointer 
+ 33.0 — Input value (file number) out of range 
+ 48.0 — File list number is invalid",TRUE
+File$Get_Volume_Directories," 
+This subroutine gets a list of all the directories on a selected volume.  It uses about 3300 words 
+of stack for the array of directory names it returns.  Therefore, you should always embed this 
+call within a CL subroutine (CL subroutine stack usage is only in effect while the subroutine is 
+executing).  The array to receive directory names must contain at least 63 elements (maximum 
+number of directories in a volume).  If the directory_id_array is not at least a 63-element string 
+array, the calling program aborts with a PROGERR. 
+ 
+SUBROUTINE File$Get_Volume_Directories 
+   (Return_Status      : OUT    NUMBER;  -- File R/W error status 
+    DA_Status          : OUT    NUMBER;  -- Data access return status 
+    File_Manager_Stat  : OUT    NUMBER;  -- File Manager error status 
+    Max_Number_Files   : OUT    NUMBER;  -- Maximum files allowed 
+    No_of_Directories  : OUT    NUMBER;  -- Number of directories 
+    Identifier_String  : OUT    STRING;  -- 20-char identifier 
+    Directory_id_Array : OUT    arr_nm;  -- String Array 1..63 to hold  
+                                         -- returned directory names 
+    Path               : IN     STRING)  -- Pathname may include  
+                                         -- file_name and extension 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+This subroutine can be used to obtain a list of directories from another LCN.  In this case, the 
+volume must be on a History Module. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 6.0 — Device error  
+ 9.0 — Volume does not exist (or in some cases is not mounted) 
+ 12.0 — Other File Manager error 
+ 18.0 — Error returned on Get/Store parameter 
+ 25.0 — Reference list number invalid ",TRUE
+File$Get_Volume_Directories_D,"This subroutine gets a list of all the directories and the directories' descriptors on a given 
+volume.  It uses about 3300 words of stack for the array of directory names and descriptors that 
+it returns.  Therefore, you should always embed this call within a CL subroutine (CL subroutine 
+stack usage is in effect only while the subroutine is executing).  The array to receive directory 
+names must contain at least 63 elements (the maximum number of directories in a volume).  If 
+the directory_id_array is not at least a 63-element string array, the calling program aborts with a 
+PROGERR. 
+ 
+The returned directory array contains the directory name in the first four characters, then a 
+space, and then the 64-character descriptor. 
+ 
+SUBROUTINE File$Get_Volume_Directories_D 
+   (Return_Status      : OUT    NUMBER;  -- File R/W error status 
+    DA_Status          : OUT    NUMBER;  -- Data access return status 
+    File_Manager_Stat  : OUT    NUMBER;  -- File Manager error status 
+    Max_Number_Files   : OUT    NUMBER;  -- Maximum files allowed 
+    No_of_Directories  : OUT    NUMBER;  -- Number of directories 
+    Identifier_String  : OUT    STRING;  -- 20-char identifier 
+    Directory_id_Array : OUT    arr_nm;  -- String Array 1..63 to hold  
+                                         -- returned directory names 
+    Path               : IN     STRING)  -- Pathname may include  
+                                         -- file_name and extension 
+ 
+This subroutine can only be called from a CL Block linked to a background insertion point. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 9.0 — Volume does not exist (or in some cases is not mounted) 
+ 12.0 — Other File Manager error 
+ 18.0 — Error returned on Get/Store parameter 
+ 25.0 — Reference list number invalid ",TRUE
+File$Modify_Directory_Descriptor,"This subroutine can be used to add, modify, or delete a directory descriptor.  Deleting a 
+descriptor means setting the descriptor value equal to all blanks. 
+ 
+SUBROUTINE File$Modify_Directory_Descriptor 
+   (Return_Status      : OUT    NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT    NUMBER;  -- File Manager error status 
+    Descriptor         : IN     STRING;  -- New descriptor value 
+    Path               : IN     STRING)  -- Pathname excluding the  
+                                         -- file_name and extension 
+ 
+This subroutine can only be called from a CL Block linked to a background insertion point. 
+ 
+The descriptor value is 64 characters long.  If the input string is less than 64 characters, the 
+remainder of the descriptor is blank filled.  If the input string is longer than 64 characters, it is 
+truncated. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 12.0 — Other File Manager error 
+ 41.0 — Duplicate volume 
+ 42.0 — Volume not mounted 
+ 43.0 — Duplicate directory 
+ 49.0 — Directory name too long 
+ 50.0 — Descriptors not defined ",TRUE
+File$Modify_File_Descriptor,"This subroutine can be used to add, modify, or delete a file's descriptor.  Deleting a descriptor 
+means setting the descriptor value equal to all blanks. 
+ 
+SUBROUTINE File$Modify_File_Descriptor 
+   (Return_Status      : OUT    NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT    NUMBER;  -- File Manager error status 
+    Descriptor         : IN     STRING;  -- New descriptor value 
+    Path               : IN     STRING)  -- Pathname including the  
+                                         -- file_name and extension 
+ 
+This subroutine can only be called from a CL Block linked to a background insertion point. 
+ 
+The descriptor value is 64 characters long.  If the input string is less than 64 characters, the 
+remainder of the descriptor is blank filled.  If the input string is longer than 64 characters, it is 
+truncated. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 12.0 — Other File Manager error 
+ 41.0 — Duplicate volume 
+ 42.0 — Volume not mounted 
+ 43.0 — Duplicate directory 
+ 49.0 — Directory name too long 
+ 50.0 — Descriptors not defined ",TRUE
+File$Modify_Volume_ID_String,"This subroutine can be used to modify a volume ID string.  The up-to-20 character volume 
+identifier must be specified in the call. 
+ 
+SUBROUTINE File$Modify_Volume_ID_String 
+   (Return_Status      : OUT    NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT    NUMBER;  -- File Manager error status 
+    Volume_id          : IN     STRING;  -- 20 character volume  
+                                         -- identifier 
+    Path               : IN     STRING)  -- Pathname excluding the  
+                                         -- filename and extension 
+ 
+The volume identifier string must be left justified (no leading spaces). 
+ 
+This subroutine can only be called from a CL Block linked to a background insertion point. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 6.0 — Device error  
+ 12.0 — Other File Manager error 
+ 33.0 — Input value out of range 
+ 42.0 — Volume not mounted ",TRUE
+File$Read_Directory," 
+This subroutine is used with the next two calls (File$Get_File_Attributes and 
+File$Read_Directory_Complete) to allow a CL program to cycle through, one at a time, 
+operations on all the files in a particular volume or directory.  This ""cycling"" would, for 
+example, be done to copy all or a subset of the files from one volume to a backup volume or to 
+delete files for a volume.  A maximum of 10 read directory operations can occur 
+simultaneously. 
+ 
+The File$Read_Directory subroutine creates a list of all the files on the volume that match the 
+""wildcard"" filename and extension specified in the pathname.  The first time it is called, this 
+subroutine returns the first 26 file names matched (if there are that many that match).  
+Subsequent calls return the second 26, etc., until all matching file names have been returned.  
+When the OUT parameter number_of_files is returned equal to zero, all file names have been 
+read. 
+ 
+After completing work on the last group of file names returned, the CL program must call the 
+subroutine File$Read_Directory_Complete to close the directory function.  This deallocates 
+space used by the list and frees up the file list number for reuse.  
+File$Read_Directory_Complete is automatically called for all ""open"" directories when a CL is 
+aborted or terminates normally.  One CL cannot access another CL's ""open"" directory. 
+ 
+SUBROUTINE File$Read_Directory 
+   (Return_Status      : OUT    NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT    NUMBER;  -- File Manager error status 
+    Number_of_files    : OUT    NUMBER;  -- Number of files returned 
+    File_List_Number   : IN OUT NUMBER;  -- List id is returned by call 
+    Path               : IN     STRING;  -- Pathname excluding file  
+                                         -- name and extension 
+    File_Name_and_ext  : IN     STRING)  -- File name and extension; 
+                                         -- must include ""wildcard""  
+                                         -- entries 
+ 
+The File_List_Number parameter must equal zero the first time the subroutine is called.  If the 
+IN value is not zero, the list number is used to access a previously created list. 
+ 
+Question marks are used as ""wildcard"" entries in file names and extensions.",TRUE
+File$Read_Directory_Complete,"This must be called to deallocate the space used for a list of file names created by 
+File$Read_Directory. 
+ 
+SUBROUTINE File$Read_Directory_Complete 
+   (Return_Status      : OUT   NUMBER;  -- File R/W error status 
+    File_Manager_Stat  : OUT   NUMBER;  -- File Manager error status 
+    File_List_Number   : IN    NUMBER)  -- List to be deallocated 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+This subroutine can be used to deallocate the space used for a list of files read from another 
+LCN (see File$Read_Directory). 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 6.0 — Device error  
+ 12.0 — Other File Manager error 
+ 42.0 — Volume not mounted  
+ 46.0 — Major corruption of AM 
+ 48.0 — File list number is invalid",TRUE
+File$Strip_Blanks,"This routine determines whether or not leading blanks are removed from values of type String 
+on subsequent calls to File$Get_Field (see heading C.6.7). 
+ 
+SUBROUTINE File$Strip_Blanks 
+   (Return_Status      : OUT NUMBER;  -- File I/O set error status 
+    File_Number        : IN  NUMBER;  -- File number from Open_File call 
+    Strip              : IN  LOGICAL) -- If = ON, strip leading blanks  
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+This routine allows a CL program to specify whether or not Get_Field will strip leading blanks 
+from values of type string.  If Strip = ON, any blank characters are removed from the beginning 
+of the string returned in the Output_Value argument.  If Strip = OFF, leading blanks are 
+retained.  The default (Strip_Blanks is never called by the CL program) is to strip leading blanks 
+from string values. 
+ 
+File_Number must be the value returned from a previous Open_File call. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 13.0 — File number is invalid 
+ 20.0 — Can’t read file control table pointer 
+ 34.0 — Number not assigned to this CL Block—access denied ",TRUE
+File$Upper_Case,"This subroutine converts all lower case alphabetic characters of a string into upper case. 
+ 
+SUBROUTINE File$Upper_Case 
+   (Converted_String   : OUT STRING;  -- The converted string 
+    String_to_Convert  : IN  STRING)  -- The string to convert 
+ 
+ 
+Possible Return_Status Values for this function: 
+ 
+  
+None",TRUE
+Get_CL_Slot,"Get_CL_Slot (s, i) 
+This subroutine takes a string input (s), compares it with the names of all CL blocks on 
+the point and returns real number index value (i) if a match is found (returns -1 if no 
+match is found).  If the input string is longer than eight characters, only the first eight 
+characters are used for the comparison.  The character string must be all in upper case.  
+Reasons for Get_CL_Slot  index to be invalid are: 
+1) slot name cannot be found (-1.0). 
+2) the character string contains lower case alphabetic characters (-1.0)",TRUE
+Int,"Int (x) -- truncate to integer  where x, is number. Returns a number.",TRUE
+Len,"Len (s) 
+Len returns the length of the String it is passed.  For example, 
+Len(""abcde"") = 5;  Len("""") = 0. ",TRUE
+Ln,"Ln (x) -- natural logarithm  where x, is number. Returns a number.",TRUE
+Log10,"Log10 (x) -- common logarithm  where x, is number. Returns a number.",TRUE
+Max,"Max (x, y, ...) -- maximum  where x, is number. Returns a number.
+Max (x) -- maximum where x is an array. Returns a number.",TRUE
+Min,"Min (x, y, ...) -- minimum  where x, is number. Returns a number.
+Min (x) -- minimum where x is an array. Returns a number.",TRUE
+Modify_String,"This subroutine changes the value of a substring in a target string to the value of a 
+substring copied from a source string.  It can be called by either Background or 
+Foreground CL Blocks. 
+ 
+Where: “s” is a $MODSTR enumeration value expressing return status. 
+ 
+ “ts” is the target string to be modified (IN OUT) 
+ “tp” is the index to the first character of the target string to modified 
+ “n” is the number of characters to move from the source string to the target string 
+ “ss” is the string from which characters will be fetched  
+ “sp” is the index to the first character to be fetched from the source string 
+ 
+If the number of characters (n) is greater than the number of characters between the 
+source position index (sp) and the end of the source string, only the number of 
+characters that exist in the source substring are moved to the target substring.  A status 
+of “OK” is returned. 
+ 
+If the number of characters (n) is greater than the number of characters between the 
+target position index (tp) and the end of the target string, the number of characters that 
+will be moved is limited by the maximum target string length of 78 characters.  A 
+status of “OK” is returned. 
+If the target position index (tp) is greater than 78, or the source position index (sp) is 
+greater than the length of the source string, a status of FAILED is returned.   
+ 
+If the target position index (tp) is greater than the current length of the target string, 
+blanks will be inserted between the current length position and the target position.",TRUE
+Move_Parameter,"This subroutine fetches a parameter value, copies it to a specified destination, and 
+returns a success/fail status value.   
+ 
+Where: “x” identifies the parameter that is to receive the value (destination data). 
+ 
+ “y” identifies the parameter value to be fetched (source data).   
+ 
+ “s” is a CLERRSTS enumeration value that defines the success or failure of 
+the store request. 
+The parameters being moved can be scalar (single elements), array elements, or entire 
+arrays.  The parameters may be on on-LCN or off-LCN points.  The source and 
+destination data types must match (see exceptions following) and, when an entire array 
+is referenced, the array sizes also must match.  Attempting to move entire arrays of 
+strings generates a runtime configuration error (CONFERR).  The requirement for data 
+type matching allows these exceptions: 
+ 
+ • Transfers between LCN Real and Integer data types are allowed. 
+ • Transfers between LCN Enumeration and Self-Defined Enumeration data types are 
+allowed as long as the value does not exceed the target enumeration range. ",TRUE
+Now,Now returns wall-clock time (seconds since midnight of the current day). ,FALSE
+Number,"Number (t) 
+This function takes a Time expression (t) as input and returns the resulting time 
+duration as a number.  The returned value is the number of seconds represented by the 
+time expression.  Time has greater precision than number so the returned value may be 
+less precise than the time expression (see heading 2.5.3.5). ",TRUE
+Number_to_String,"This subroutine creates a human readable characterization of a real number.  It can be 
+called by either Background or Foreground CL Blocks. 
+ 
+Where: “s” will contain the return status of the store request. 
+  OK = successful conversion 
+  BADFORM = the format string was incorrect 
+  BADVALU = the number provided was bad 
+ 
+ “str” will contain the character representation of the specified real value 
+ 
+ “i” identifies the number to convert 
+ 
+ “f” is a format specification describing the desired character representation of 
+the converted number.  Format specifications are as described in Appendix A 
+of the Picture Editor Reference Manual.  Number_to_String accepts only 
+format specifications “Real” and “Unknown”.  There is no default, thus a 
+value must be specified for this argument. ",TRUE
+Ord,"Ord (e) 
+This function takes the current state of a standard enumeration, custom enumeration, 
+or self-defining enumeration and returns a number value (where zero represents the 
+first enumeration member).  The enumeration can be in a CL LOCAL variable, a 
+parameter on the Bound Data Point, or a parameter on another point.  The CL will 
+abort on any of these errors: 
+1) Reference is not to an enumeration or self-defining enumeration (“cnferr” error 
+returned at runtime). 
+2) Reference specifies a whole array (“cnferr” error returned at runtime). 
+3) Cannot access enumeration of the point referenced (runtime error type is data 
+owner dependent).",TRUE
+Round,"Round (x) -- round to integer  where x, is number. Returns a number.",TRUE
+Self,"This function returns the slot number of the currently executing CL/AM block.  For 
+example, suppose a CL/AM block needs to read the parameter CLBLKERR to 
+determine whether any errors occurred the previous time the block executed.  A data 
+point can have many CL/AM blocks; therefore, all parameters of the CL/AM segment 
+that deal with individual blocks, like CLBLKERR, are arrays indexed by slot number. 
+A CL/AM block must be able to discover its slot number, because the slot number can 
+change as blocks are linked and unlinked to the point. This function is the mechanism 
+provided to do so; therefore, the statement 
+  IF clblkerr(SELF) <> noerror THEN 
+ & SEND: ""Error last time I ran"" 
+ 
+could be used to determine if the block had errors the last time it executed.",FALSE
+Set_Bad,"Set_Bad (x) 
+This subroutine stores the bad value bit pattern into the numeric variable x. ",TRUE
+Set_Null_Point_id,"Set_Null_Point_id (p, s) 
+This subroutine will store a null point identifier to a CDS parameter (p) of type data 
+point identifier (this can be either a single CDS parameter or a subscripted element of 
+an array) and returns a success/fail status (s).  The status is a CLERRSTS enumeration 
+value that will be abnormal for any of the following reasons: 
+1) point_id specifies an entire array (cnferr). 
+2) destination  is not a CDS of type point_id (cnferr). 
+3) store failed (data owner dependent) 
+ 
+For CL Blocks compiled on Release 400 and subsequent releases, a call to the 
+Set_Null_Point_id subroutine first fetches the value of the parameter to determine the 
+LCN identifier of the point, and then will store the null point identifier with the correct 
+LCN identifier. 
+ 
+For CL Blocks compiled prior to Release 400, a call to the Set_Null_Point_id 
+subroutine stores an on-LCN null point id into the referenced parameter.  If the 
+parameter contains an off-LCN point id, the LCN indication is lost, and a reference to 
+that parameter generates a configuration error at runtime.  If you need to be able to 
+retain an off-LCN indication in the parameter for these blocks, unlink, recompile the 
+CL Block on Release 400 and relink the block. 
+
+Off-node store requests initiated from Background CL Blocks take place immediately, 
+while off-node store requests initiated from foreground blocks take place at the end of 
+point processing. ",TRUE
+Sin,"Sin (x) -- sine  where x, is number. Returns a number.",TRUE
+Sqrt,"Sqrt (x) -- square root  where x, is number. Returns a number.",TRUE
+Sum,"Sum (x, y, ...) -- sum  where x, is number. Returns a number.
+Sum (x) -- sum where x is an array. Returns a number.",TRUE
+Tan,"Tan (x) -- tangent  where x, is number. Returns a number.",TRUE
+Finite,"Finite (X) returns ON if, and only if, X is Finite; that is, neither a bad value nor an infinite 
+value. ",TRUE
+Badval,"Badval(X) 
+returns ON if, and only if, X is a bad value",TRUE
+Day_Time,Built-in Function (MC only),FALSE
+File$Create_File,"This routine creates a new file. 
+ 
+SUBROUTINE File$Create_File 
+ (Return_Status       : OUT NUMBER; -- File R/W package error status 
+  File_Manager_Status : OUT NUMBER; -- File Manager error enumeration 
+  Max_Record_Length   : IN  NUMBER; -- Number of Characters per record 
+  Path                : IN  STRING) -- Full path of file to be created 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+It creates a file of variable length records with the maximum number of characters allowed in a 
+record specified by Max_Record_Length.  The Max_Record_Length may be from 1 to 15,666. 
+ 
+""Path"" must specify the pathname of a file on the history module or a floppy/cartridge (see 
+heading C.2.4). 
+If the file already exists, an error is returned and the file is not opened. 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 4.0 — File already exists 
+ 7.0 — File table for the specified volume is full 
+ 9.0 — Volume does not exist (or in some cases is not mounted) 
+ 10.0 — No more space on the volume 
+ 12.0 — Other File Manager error 
+ 29.0 — File reserved for another operation 
+ 38.0 — Invalid record length in Create_File or Open_File call ",TRUE
+File$Open_File,"Before a file can be read from or written to, it must be opened.  You should close files after all 
+reading/writing is complete even though they are automatically closed when a CL Block 
+terminates or is aborted. 
+ 
+SUBROUTINE File$Open_File 
+  (Return_Status       : OUT NUMBER; -- File R/W package error status 
+   File_Manager_Status : OUT NUMBER; -- File Manager error status 
+   File_Number         : OUT NUMBER; -- File id used on subsequent calls 
+   Number_Of_Records   : OUT NUMBER; -- Number of records now in file. 
+   Buffer_Size         : IN  NUMBER; -- Maximum characters per record. 
+   Path                : IN  STRING; -- Full name of file to be opened. 
+   Access_privilege    : IN  NUMBER) -- File access type 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point.  All 
+operations performed on a file (e.g., read, write, close) must be done from the CL Block that 
+opens the file. 
+ 
+This subroutine opens an existing file containing variable length records.  ""Path"" must specify 
+the pathname of a file on the history module or a floppy/cartridge (see heading C.2.4).  If the 
+file does not exist, an error is returned. 
+ 
+Buffer_Size specifies the number of characters allocated for the I/O buffer used to hold records 
+read from or written to the file (i.e., the current record). ",TRUE
+File$Put_Field,"This routine writes values to fields in the specified file’s current record. 
+ 
+SUBROUTINE File$Put_Field 
+  (Return_Status : OUT NUMBER; -- File R/W package error status 
+   DA_Status     : OUT NUMBER; -- Data Access error status 
+   Character_Ptr : IN OUT NUMBER; -- Offset to beginning of field 
+   File_Number   : IN NUMBER; -- File id from open_file call 
+   Input_Value   : IN cl_type; -- Value to be converted (cannot be  
+ -- self-defined enumeration type) 
+   Format        : IN STRING; -- Specified format of field 
+   Suffix        : IN STRING) -- Suffix added to field 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Put_Field takes an Input_Value in internal form, converts it to a string and places it at the 
+Character_Ptr position in the current record. 
+ 
+If Input_Value is an array, the CL Block is aborted.  To convert an array each element must be 
+converted separately. 
+ 
+Character_Ptr is the character-offset from the beginning of the record to the beginning of the 
+field to be written.  When Put_Field returns it will contain the position of the character after the 
+written field.  Note that the character pointer must be initialized (normally to 1) the first time a 
+field is placed in a record.  Normally, when sequential calls are used to create a single record 
+image, the Character_Ptr value returned on previous calls is passed without change on 
+subsequent Put_Field calls, but Character_Ptr can be set to any position. 
+ 
+Character_Ptr may be set to point beyond the last character written to the current record and the 
+record is blank filled from the character position after the last character to the one preceding that 
+pointed to by Character_Ptr.  Character_ptr may point at a previously written field in the current 
+record and characters in that field will be overwritten. 
+ 
+The string Suffix is an optional value appended to the field.  Normally, Suffix is a single 
+delimiter such as a comma or a space, but any string is allowed. 
+ 
+File_Number must be the value returned on a previous Open_File call. 
+ 
+Format is a specification of how the external value will appear after conversion.  If Format is set 
+to the empty string (i.e., """") the default format specification is used.  The default format 
+specification for the various data types are: 
+ 
+number R-ZZZZ9.99 
+logical  TEXTL1:5 
+string  TEXTL1:10 
+time    DATE MM-DD-YY ENDATE 
+enumeration TEXTL1:10 
+entity (point id) TEXTL1:10 ",TRUE
+File$Put_Field_S," 
+This routine writes values to fields in a CL or CDS string. 
+ 
+SUBROUTINE File$Put_Field_S 
+  (Return_Status : OUT NUMBER; -- File R/W package error status 
+   DA_Status     : OUT NUMBER; -- Data Access error status 
+   Character_Ptr : IN OUT NUMBER; -- Pointer to field 
+   Output_String : IN OUT STRING; -- String to place field in 
+   Input_Value   : IN cl_type; -- Value to be converted (cannot be  
+ -- self-defined enumeration type) 
+   Format        : IN STRING; -- Specified field format 
+   Suffix        : IN STRING) -- Suffix added to field 
+ 
+This subroutine can be called from CL blocks linked to any insertion point. 
+ 
+The Put_Field_S function takes Input_Value in internal form, converts it to external form and 
+places it, beginning at the Character_Ptr position, in Output_String. 
+ 
+Output_String can be either a local CL string or a CDS string parameter. 
+ 
+If Input_Value is an array, the CL is aborted.  To convert an array each element must be 
+converted separately. 
+ 
+Suffix is an optional value appended to the field.  Normally, suffix is a single delimiter such as a 
+comma or a space, but any string is allowed. 
+ 
+Character_Ptr is the character-offset from the beginning of the string to the beginning of the 
+field to be written.  It is returned with the position of the character after the written field.  
+Normally, the Character_Ptr value returned on previous calls is passed on subsequent calls, but 
+Character_Ptr can be set to any position in the string. 
+ 
+The length of Output_String is updated each time a Put_Field_S causes Output_String to be 
+extended.  Note that it is recommended that Output_String be initialized with a null string (i.e., 
+"""") to set its length to zero before putting the first field into it. 
+ 
+Character_Ptr can be set to point beyond the current length of the string and the string will be 
+blank filled from the current end of the string to the character preceding the one pointed to by 
+Character_Ptr.  Character_Ptr may point at any character in the string and that character, and 
+subsequent characters, will be overwritten with the new converted value. 
+ 
+Format is a specification of how the external value will appear after conversion.  The default 
+format specification for the various data types are: 
+ 
+number  R-ZZZZ9.99 
+logical     TEXTL1:5 
+string  TEXTL1:10 
+enumeration TEXTL1:10 
+entity (point id)     TEXTL1:10 
+time    DATE MM-DD-YY ENDATE ",TRUE
+File$Write_Record,"This routine writes a file’s current record to that file. 
+ 
+SUBROUTINE File$Write_Record 
+  (Return_Status       : OUT NUMBER;    -- File R/W package error status 
+   File_Manager_Status : OUT NUMBER;    -- File Manager error status 
+   File_Number         : IN  NUMBER;    -- File id from Open_File call 
+   Record_Number       : IN OUT NUMBER) -- Record number to write 
+ 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Record_Number specifies the record to be written or overwritten.  If Record_Number is zero, 
+the record is appended to the end of the file.  On appends, the number of the record written is 
+returned in Record_Number.  If the record pointed to by Record_Number already exists, the 
+new record must have the same record length as the existing record.  The record is not altered in 
+any way if an error occurs during a write (the data in the record is not erased). 
+ 
+File_Number must be the value returned on a previous Open_File call. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 6.0 — Device error while reading file 
+ 10.0 — No more space on the volume 
+ 11.0 — Read or write beyond end of file 
+ 12.0 — Other File Manager error 
+ 13.0 — File number is invalid 
+ 20.0 — Can't read file control table pointer 
+ 31.0 — Invalid record number 
+ 34.0 — Number not assigned to this CL Block—access denied",TRUE
+File$Read_Record,"This routine reads a record from a file to the file’s current record. 
+ 
+SUBROUTINE File$Read_Record 
+  (Return_Status       : OUT NUMBER; -- File R/W package error status 
+   File_Manager_Status : OUT NUMBER; -- File Manager error status 
+   File_Number         : IN  NUMBER; -- File id from Open_File call 
+   Record_Size         : OUT NUMBER; -- Characters in read record 
+   Record_Number       : IN  NUMBER) -- Number of record to read 
+ 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Read_Record reads the record specified by Record_Number from the file indicated by 
+File_Number.  File_Number must be the value returned on a previous Open_File call. 
+ 
+Record_Size is returned with the number of characters in the record just read. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 6.0 — Device error while reading file 
+ 11.0 — Read or write beyond end of file 
+ 12.0 — Other File Manager error 
+ 13.0 — File number is invalid 
+ 20.0 — Can't read file control table pointer 
+ 31.0 — Invalid record number 
+ 34.0 — Number not assigned to this CL Block—access denied 
+ 35.0 — Maximum record length exceeded 
+ 36.0 — Can't access file (due to HM failure, etc.) ",TRUE
+File$Get_Field,"This routine reads values from fields in the specified file’s current record. 
+ 
+SUBROUTINE File$Get_Field 
+  (Return_Status : OUT NUMBER; -- File R/W package error status 
+   DA_Status     : OUT NUMBER; -- Data Access error status 
+   Character_Ptr : IN OUT NUMBER; -- Character offset to the field 
+   File_Number   : IN  NUMBER; -- File number from Open_File call 
+   Output_Value  : OUT cl_type; -- Variable of any valid CL data type 
+ -- excepting self-defined enumeration 
+   Field_Width   : IN  NUMBER)  -- Width of field (for output  
+ -- 
+strings) 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Get_Field extracts an external value from a field in the current record of the specified file, 
+converts it to internal form and stores it into Output_Value.  Character_Ptr must point to the 
+beginning of the field.   Anticipated field delimiters are: Space, Comma, Left Parenthesis, Right 
+Parenthesis, Colon, Semicolon, and Carriage Return. 
+ 
+The following applies only to Output_Values not of type ""string"": 
+ 
+Get_Field scans the current record from left to right skipping any leading blank characters and 
+extracts characters until it finds a delimiter.  
+ 
+After the extracted external value is converted to internal form and stored in Output_Value, 
+Character_Ptr is adjusted to point to the character after the delimiter. 
+ 
+For Output_Values of data type ""string,"" the following special rules apply: 
+ 
+Field_Width specifies the number of consecutive characters that will be moved into 
+Output_Value.  Any field delimiters found among these characters are considered to be part of 
+the string.  Character_Ptr is returned pointing at the character immediately following the last 
+character transferred.  (Please note that, depending on the record structure, Character_Ptr 
+could wind up pointing to data, or to a field delimiter, or it could be pointing outside the 
+record). 
+ 
+If File$Strip_Blanks (see heading C.6.26) was last called with Strip set to ""ON"" (or if 
+File$Strip_Blanks was never called by this program), any leading blank characters are skipped 
+over and the count of characters to be transferred starts at the first non-blank character.  If 
+only blanks remain in the current record, Return_Status is set to 14.0. 
+ 
+If File$Strip_Blanks was last called with Strip set to ""OFF,"" the character pointed to by 
+Character_Ptr (blank or not) becomes the first of the specified number of characters to be 
+moved to Output_Value. 
+ 
+If the extracted string is a self-defined enumeration, you can convert it to internal form by using 
+the ""File$Convert_SDE_To_Internal"" subroutine. ",TRUE
+File$Get_Field_S,"This routine reads values from a string variable. 
+ 
+SUBROUTINE File$Get_Field_S 
+  (Return_Status : OUT NUMBER; -- File R/W package error status 
+   DA_Status     : OUT NUMBER; -- Data Access error status 
+   Character_Ptr : IN OUT NUMBER; -- Character offset to the field 
+   Input_String  : IN  STRING; -- String to read field from 
+   Output_Value  : OUT cl_type; -- Variable of any valid CL data type 
+ -- excepting self-defined enumeration 
+   Field_Width   : IN  NUMBER) -- Field width (for output strings) 
+ 
+ 
+This subroutine can be called from CL blocks linked to any insertion point. 
+ 
+Input_String can be either a local CL string or a CDS string parameter. 
+ 
+Get_Field_S extracts an external value from a field within an Input_String, converts it to 
+internal form and stores it into Output_Value.  Character_Ptr must point to the beginning of the 
+field.  Get_Field_S scans Input_String from left to right skipping any leading blank characters 
+and extracts characters until it finds a delimiter. 
+ 
+After the extracted string is converted to internal form and stored in Output_Value, 
+Character_Ptr is adjusted to point to the character after the delimiter. 
+ 
+If the extracted string is a self-defined enumeration, you can convert it to internal form by using 
+the ""File$Convert_SDE_To_Internal"" subroutine. 
+ 
+For output_values of data type ""string,"" the width of the field is specified by Field_Width.  The 
+string starts with the first non-blank character in the field and Character_Ptr is adjusted to point 
+to the character after the number of characters specified by Field_Width.  Note that leading 
+blanks on a string can cause problems since blanks are used both as delimiters and for fill 
+characters; therefore, correct field length is important. 
+ 
+Anticipated field delimiters are: 
+ 
+- Space 
+- Comma 
+- Left Parenthesis 
+- Right Parenthesis 
+- Colon 
+- Semicolon 
+- Carriage Return ",TRUE
+File$Close_File,"This routine closes a previously opened file. 
+ 
+SUBROUTINE File$Close_File 
+  (Return_Status        : OUT NUMBER; -- File R/W package error status 
+   File_Manager_Status  : OUT NUMBER; -- File Manager error status 
+   File_Number          : IN NUMBER)  -- File id from Open_File 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+File_number is the value returned by the Open_File call. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 6.0 — Device error while reading file 
+ 12.0 — Other File Manager error 
+ 13.0 — File number is invalid 
+ 20.0 — Can't read file control table pointer 
+ 34.0 — Number not assigned to this CL Block—access denied",TRUE
+File$Copy_Record,"This routine copies the current record associated with one open file to the current record 
+associated with another open file. 
+ 
+SUBROUTINE File$Copy_Record 
+   (Return_Status       : OUT NUMBER; -- File R/W package error status 
+    Source_File         : IN  NUMBER; -- File id from Open_File 
+    Destination_File    : IN  NUMBER) -- File id from Open_File 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Copy_Record makes a copy of the current record (see heading C.2.7 for the definition of current 
+record) of Source_File and puts it in the current record of Destination_File.  Any data in the 
+current record of Destination_File is overwritten.  Note that a File$Write_Record of the current 
+record of Destination_File must be done to get the record out to the file. 
+ 
+If the memory allocated to the current record of Destination_File is insufficient to hold the 
+contents of the current record of Source_File, the current_record of Destination_File is filled 
+with as much of the current record of source_file as will fit and Return_Status will be 32.0 (Data 
+placed in destination file record was truncated). 
+ 
+Source_File and Destination_File must be the values returned on previous Open_File calls. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 13.0 — File number is invalid 
+ 20.0 — Can't read file control table pointer 
+ 32.0 — Record was truncated 
+ 34.0 — Number not assigned to this CL Block—access denied ",TRUE
+File$Copy_File,"This routine makes a copy of an existing file. 
+ 
+SUBROUTINE File$Copy_File 
+  (Return_Status         : OUT NUMBER; File R/W package error status 
+   File_Manager_Status   : OUT NUMBER; File Manager error status 
+   Offender              : OUT NUMBER; File to which status pertains 
+   Source_File_Path      : IN  STRING; Pathname of source file. 
+   Destination_File_Path : IN  STRING) Pathname of destination file. 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Offender specifies the file to which the status fields refer (0=source, 1=destination, 
+2=temporary, 3=status is not specific to a file). 
+ 
+This call is used to copy one file and its attributes (e.g., protection, max_record_length) to 
+another file.  If the destination file does not exist, it is created by the file manager.  If the 
+destination file exists, it is deleted, then recreated with the attributes of the source file and the 
+source file is copied into it.  The source file is opened with ""shared read no write.""  The 
+destination file is opened with ""exclusive read/write.""  If the source file contains no records, the 
+destination file is created with no records. 
+ 
+This subroutine can be used to copy a file from one LCN to another LCN.  When either the 
+source or destination is on a remote LCN, that file must be on a History Module. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 3.0 — File privilege violation 
+ 4.0 — File already exists (new file) 
+ 5.0 — File does not exist (old file) 
+ 6.0 — Device error while reading file 
+ 7.0 — File table for the specified volume is full 
+ 9.0 — Volume does not exist (or in some cases is not mounted) 
+ 10.0 — No more space on the volume 
+ 12.0 — Other File Manager error 
+ 22.0 — Maximum number of files already open 
+ 28.0 — File already open 
+ 29.0 — File reserved for another operation 
+ 35.0 — Maximum record length exceeded 
+ 36.0 — Can't access file (due to HM failure, etc.) ",TRUE
+File$Exists,"This routine determines if a given file exists. 
+ 
+SUBROUTINE File$Exists 
+  (Return_Status       : OUT NUMBER;  -- File R/W package error status 
+   File_Manager_Status : OUT NUMBER;  -- File Manager error status 
+   Path                : IN  STRING;  -- Name of file to search for. 
+   File_Exists         : OUT LOGICAL) -- Indicates if file exists. 
+ 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+The Exists subroutine determines whether the file named in Path exists.  If it exists, File_Exists 
+is ON; if it does not exist File_Exists is OFF.  Question marks in the file name in Path are 
+illegal. 
+ 
+This subroutine can be used to determine if a file exists on another LCN.  In this case, the file to 
+be checked for must be on a History Module. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 6.0 — Device error while reading file 
+ 9.0 — Volume does not exist (or in some cases is not mounted) 
+ 12.0 — Other File Manager error 
+ 28.0 — File already open 
+ 29.0 — File reserved for another operation 
+ 36.0 — Can't access file (due to HM failure, etc.) ",TRUE
+File$Find_Field_Pointer," 
+This routine finds a field in the specified file’s current record. 
+ 
+SUBROUTINE File$Find_Field_Pointer 
+  (Return_Status   : OUT NUMBER; -- File R/W package error status 
+   Character_Ptr   : OUT NUMBER; -- Character offset to field 
+   Field_Number    : IN  NUMBER; -- Number of the requested field 
+   File_Number     : IN  NUMBER; -- File id from Open_File call 
+   Field_Delimiter : IN  STRING; -- Character that separates fields 
+   Escape_Marker   : IN  STRING) -- Character to jump over on scan 
+ 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Character_Ptr is returned with the character position of the beginning of the field specified by 
+Field_Number.  Note that if the requested field is empty (i.e., two consecutive field delimiters) 
+the pointer will be set to the character position of the first delimiter.  A request via 
+File$Get_Field to get the contents of an empty field results in a conversion error. 
+ 
+Field_Delimiter is the character used to separate fields in the current record of the file specified 
+by File_Number.  If Field_Delimiter does not occur in the current record, Return_Status will be 
+14.0. 
+ 
+Escape_Marker is an optional value that specifies a character which is used to bracket a string 
+of characters which will not be searched for Field_Delimiter. 
+ 
+Only the first character of Field_Delimiter or Escape_Marker is used. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 13.0 — File number is invalid 
+ 14.0 — Attempt to read/write field beyond end of buffer 
+ 20.0 — Can't read file control table pointer 
+ 30.0 — Invalid field number 
+ 34.0 — Number not assigned to this CL Block—access denied",TRUE
+File$Find_Field_Pointer_S,"This routine finds a field in a string. 
+ 
+SUBROUTINE File$Find_Field_Pointer_S 
+  (Return_Status   : OUT NUMBER; -- File R/W package error status 
+   Character_Ptr   : OUT NUMBER; -- Character offset to field 
+   Field_Number    : IN  NUMBER; -- Number of the requested field 
+   Input_String    : IN  STRING; -- String to be scanned 
+   Field_Delimiter : IN  STRING; -- Character that separates fields 
+   Escape_Marker   : IN  STRING) -- Character to jump over on scan 
+ 
+ 
+This subroutine can be called from CL blocks linked to any insertion point. 
+ 
+Character_Ptr is returned with the character position of the beginning of the field specified by 
+Field_Number.  Note that if the requested field is empty (i.e., two consecutive field delimiters) 
+the pointer will be set to the character position of the first delimiter.  A request via 
+File$Get_Field_S to get the contents of an empty field results in a conversion error. 
+ 
+Field_Delimiter is the character used to separate fields in the Input_String. 
+ 
+Escape_Marker is an optional value that specifies a character which is used to bracket a string 
+of characters which will not be searched for Field_Delimiter. 
+ 
+Only the first character of Field_Delimiter or Escape_Marker is used. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 24.0 — Attempt to read/write field beyond end of string 
+ 30.0 — Invalid field number ",TRUE
+File$Set_Null,"This routine sets the length of the current record to zero. 
+ 
+SUBROUTINE File$Set_Null 
+   (Return_Status : OUT NUMBER; -- File R/W package error status 
+    File_Number   : IN  NUMBER) -- File id from Open_File call. 
+ 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+This call sets the current record length to 0.  The maximum record length specified on the 
+Open_File call is not affected. 
+ 
+File_Number is the value returned from an Open_File call. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 13.0 — File number is invalid 
+ 20.0 — Can't read file control table pointer 
+ 34.0 — Number not assigned to this CL Block—access denied ",TRUE
+File$Blank_Fill,"This routine places a string of blank characters into the specified file’s current record. 
+ 
+SUBROUTINE File$Blank_Fill 
+   (Return_Status     : OUT NUMBER;    -- File R/W package error status 
+    Character_Ptr     : IN OUT NUMBER; -- Offset at which to start fill 
+    Fill_to_Character : IN  NUMBER;    -- Offset at which to end fill 
+    File_Number       : IN  NUMBER)    -- File id from Open_File call. 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+This call fills the current record of the file specified by File_Number with blanks from the 
+Character_Ptr position up to, and including, the Fill_To_Character position. 
+ 
+If the Character_Ptr is equal to, or larger than, the Fill_to_Character, nothing is done. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 13.0 — File number is invalid 
+ 14.0 — Attempt to read/write field beyond end of buffer 
+ 20.0 — Can't read file control table pointer 
+ 34.0 — Number not assigned to this CL Block—access denied 
+ 40.0 — Invalid character pointer ",TRUE
+File$Blank_Fill_S,"This routine places a string of blank characters into a string. 
+ 
+SUBROUTINE File$Blank_Fill_S 
+   (Return_Status     : OUT NUMBER;     -- File R/W package error status 
+    Character_Ptr     : IN  OUT NUMBER; -- Offset at which to start fill 
+    Fill_to_Character : IN  NUMBER;     -- Offset at which to end fill 
+    Output_String     : IN  OUT STRING) -- String to place blanks in 
+ 
+ 
+This subroutine can be called from CL blocks linked to any insertion point. 
+ 
+This call fills the string Output_String with blanks from the Character_Ptr position up to, and 
+including, position specified by Fill_to_Character. 
+ 
+If the Character_Ptr is equal to, or larger than, the Fill_to_Character, nothing is done. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 24.0 — Attempt to read/write field beyond end of string 
+ 40.0 — Invalid character pointer ",TRUE
+File$Rename,"This routine changes the name of an existing file. 
+ 
+SUBROUTINE File$Rename 
+   (Return_Status       : OUT NUMBER; -- File R/W package error status 
+    File_Manager_Status : OUT NUMBER; -- File Manager error status 
+    Old_File_Path       : IN  STRING; -- Existing file’s name 
+    New_Name            : IN  STRING; -- New file name 
+    New_Extension       : IN  STRING) -- New file extension 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Rename_File changes the name of the file specified by Old_File_Path to the name specified by 
+New_Name and New_Extension.  The file must be closed and unprotected or an error code is 
+returned. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 3.0 — File privilege violation 
+ 4.0 — File already exists (new file) 
+ 5.0 — File does not exist (old file) 
+ 9.0 — Volume does not exist (or in some cases is not mounted) 
+ 12.0 — Other File Manager error 
+ 26.0 — Bad file name 
+ 27.0 — Bad file extension 
+ 28.0 — File already open 
+ 29.0 — File reserved for another operation ",TRUE
+File$Safe_Rename,"This routine takes the name of an existing file and gives it to a new file of the same type. 
+ 
+SUBROUTINE File$Safe_Rename 
+  (Return_Status       : OUT NUMBER; -- File R/W package error status 
+   File_Manager_Status : OUT NUMBER; -- File Manager error status 
+   Old_File_Path       : IN  STRING; -- File whose identity is stripped 
+   Temporary_Name      : IN  STRING; -- Name of file to be renamed 
+   Temporary_Extension : IN  STRING) -- Extension of file to be renamed 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Safe_Rename gives the full pathname of the original file (specified by Old_File_Path) to the 
+Temporary File (Temporary_Name.Temporary_Extension) and deletes the original file.  Both 
+files must be unprotected, on the same volume and closed. 
+ 
+This method of renaming a file ensures that the file is not corrupted if a remote node fails in the 
+middle of a rename operation.   
+ 
+To use this function, first create a Temporary File (see heading C.2.11) which holds the contents 
+of the original file, then modify the temporary file.  Once the modifications are complete, 
+invoke the Safe_Rename routine to complete the operation. 
+ 
+If the history module fails during the safe rename operation, two files with the same name could 
+exist.  During startup of the history module the file manager checks for duplicate file names and 
+deletes the one with the oldest time stamp. 
+ 
+If the node which initiated the safe rename function fails before the safe rename operation is 
+complete, the temporary file is renamed and the original file is deleted. 
+ 
+If the Old_File_Path file or the Temporary_Name file is open when this subroutine is called, a 
+File Reserved for Another Operation error code is returned. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 3.0 — File privilege violation 
+ 5.0 — File does not exist (old file) 
+ 6.0 — Device error while reading file 
+ 9.0 — Volume does not exist (or in some cases is not mounted) 
+ 12.0 — Other File Manager error 
+ 22.0 — Maximum number of files already open 
+ 26.0 — Bad file name 
+ 27.0 — Bad file extension 
+ 29.0 — File reserved for another operation ",TRUE
+File$Protect_File,"Use this routine to protect the named file from deletion or to unprotect it (allow deletion by the 
+built-in subroutine Delete_File). 
+ 
+SUBROUTINE File$Protect_File 
+   (Return_Status       : OUT NUMBER;  -- File R/W package error status 
+    File_Manager_Status : OUT NUMBER;  -- File Manager status 
+    Path                : IN  STRING;  -- Name of file to protect 
+    Protect             : IN  LOGICAL) -- ON = protect, OFF = unprotect 
+ 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+Protect_File changes the protection status of the file name in Path.  When a file is protected, it 
+cannot be deleted.  The file must be closed before calling this subroutine or a ""File Already 
+Open"" error code is returned. 
+ 
+If Protect contains ON, the file will be protected.  If Protect contains OFF, the file will be 
+unprotected.  If Protect is ON and the file is already protected, then nothing is done.  If Protect 
+is OFF and the file is already unprotected, then nothing is done. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 3.0 — File privilege violation 
+ 5.0 — File does not exist 
+ 6.0 — Device error while reading file 
+ 12.0 — Other File Manager error 
+ 28.0 — File already open 
+ 29.0 — File reserved for another operation 
+ 36.0 — Can't access file (due to HM failure, etc.) ",TRUE
+File$Convert_SDE_to_Internal,"This routine converts a self-defined enumeration state name to its internal form. 
+ 
+SUBROUTINE File$Convert_SDE_to_internal 
+   (Status      : OUT NUMBER;       -- File R/W package error status 
+    State_Name  : IN  STRING;       -- State Name from an SDE 
+    Param_Name  : IN  cl_type;      -- Name of SDE parameter 
+    SDE_Value   : OUT cl_type)      -- Ordinal value of state name 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+This routine converts State_Name, the name of a state from a self-defined enumeration (SDE), 
+to its ordinal value and stores it in SDE_Value.  Param_Name must be a parameter of SDE type 
+that contains a state with the same name as the value for State_Name, or the CL block is aborted 
+with a PROGERR. 
+ 
+SDE_Value can be a CL local variable or a parameter.  Its data type can be Number, 
+Enumeration, or Self-Defined Enumeration.  If it is not one of these types, the CL block is 
+aborted with a PROGERR. 
+ 
+If SDE_Value is of type Number, the ordinal value associated with State_Name is stored in it.  
+For instance, if Param_Name specifies a parameter of type Self-Defined Enumeration with 
+states red/green, and State_Name is green, then SDE_Value is 1.0 (the ordinal value of the first 
+state in an enumeration is zero). 
+ 
+If SDE_Value is of data type Enumeration or Self-Defined Enumeration, the value to be stored 
+in it is the state which is in the ordinal position corresponding to the ordinal position of the 
+value State_Name in the enumeration defined by Param_Name.  For instance, if Param_Name 
+specifies a parameter of self-defined enumeration with states of red/green, the State_Name value 
+is green, and SDE_Value identifies an enumeration with state names of dog/cat, then the value 
+returned in SDE_Value is cat. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 18.0 — Error returned on Get/Store parameter 
+ 19.0 — Error on Data Access conversion (bad state name or bad point.parameter)",TRUE
+File$Convert_SDE_To_ASCII,"This routine converts an internal value of type Self-Defined Enumeration to external form. 
+ 
+SUBROUTINE File$Convert_SDE_to_ASCII 
+   (Status       : OUT NUMBER;       -- File R/W package error status 
+    State_Name   : OUT STRING;       -- State name from an SDE 
+    Param_Name   : IN  cl_type;      -- Parameter of type SDE 
+    SDE_Value    : IN  cl_type)      -- Ordinal value of state name 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+This subroutine converts sde_value to its state name. 
+ 
+Param_Name must be a parameter of SDE type that contains at least as many states as the 
+ordinal value of SDE_Value, or the CL block is aborted with a PROGERR. 
+ 
+SDE_Value can be a CL local variable or a parameter.  Its data type can be Number, 
+Enumeration or Self-Defined Enumeration.  If it is not one of these types, the CL block is 
+aborted with a PROGERR. 
+ 
+If SDE_Value is of type Number, the name returned in State_Name is the state at the ordinal 
+position specified by SDE_Value.  For instance, if Param_Name specifies a parameter of self-defined
+enumeration with states of red/green, and SDE_Value is 1.0, then the value returned for 
+State_Name is green (note that the ordinal value of the first state in an enumeration is zero). 
+ 
+If SDE_Value is of type Enumeration or Self-Defined Enumeration, the name returned in 
+State_Name corresponds to the state name which is in the ordinal position specified by 
+SDE_Value in the enumeration type of Param_Name.  For instance, if Param_Name specifies a 
+parameter of self-defined enumeration with states of red/green, and SDE_Value is an 
+enumeration with state names of dog/cat with a current value of cat, then the value returned for 
+State_Name is ""green."" 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 18.0 — Error returned on Get/Store parameter 
+ 19.0 — Error on Data Access conversion (bad state name or bad point.parameter) ",TRUE
+File$Get_Volume_Statistics,"This routine acquires information on a particular disk volume. 
+ 
+SUBROUTINE File$Get_Volume_Statistics 
+   (Return_Status       : OUT NUMBER; -- File R/W package error status 
+    File_Manager_Status : OUT NUMBER; -- File Manager error status 
+    Volume_Size         : OUT NUMBER; -- Total sectors in volume 
+    Amount_Allocated    : OUT NUMBER; -- Allocated sectors in volume 
+    Path                : IN  STRING) -- Name of the Volume 
+ 
+ 
+This subroutine can only be called from a CL block linked to a background insertion point. 
+ 
+This subroutine retrieves the total space and the amount of space already allocated on a virtual 
+volume of a History Module. 
+ 
+Volume_Size will contain the total number of sectors shared by all directories on the volume.  
+Amount_Allocated will contain the number of sectors currently allocated to files on the volume. 
+ 
+Path must contain the full pathname of a file on the volume.  If the name of a file on the volume 
+is not known, then an arbitrary filename may be specified (i.e., NET>VOL>X.X). 
+ 
+For more information on volume statistics, refer to the Utilities Operation manual. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 1.0 — Invalid file pathname 
+ 9.0 — Volume does not exist (or in some cases is not mounted) 
+ 12.0 — Other File Manager error ",TRUE
+File$Create_Character,"This routine takes a number and converts it to the equivalent ASCII character. 
+ 
+SUBROUTINE File$Create_Character 
+   (Return_Status : OUT NUMBER; -- File R/W package error status 
+    Char_Output   : OUT STRING; -- The character requested 
+    Decimal_Input : IN  NUMBER) -- Ordinal value of character 
+ 
+ 
+This subroutine can be called from CL blocks linked to any insertion point. 
+ 
+This subroutine takes a number from 0 to 256, converts it into a single ASCII character, and 
+returns it in a CL string of length 1.  It can be used to create characters that cannot be entered 
+through the keyboard. 
+ 
+Possible Return_Status Values for this function: 
+ 
+ 0.0 — Good status 
+ 33.0 — Input value out of range ",TRUE
