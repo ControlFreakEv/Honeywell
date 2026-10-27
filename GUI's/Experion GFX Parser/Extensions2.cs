@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace Honeywell.GUI.ExperionGfx
             if (cell.CellType == CellType.String)
                 return cell.StringCellValue;
             else if (cell.CellType == CellType.Numeric)
-                return cell.NumericCellValue.ToString();
+                return cell.NumericCellValue.ToString(CultureInfo.InvariantCulture);
             else if (cell.CellType == CellType.Boolean)
                 return cell.BooleanCellValue.ToString();
 

@@ -52,11 +52,9 @@ namespace Honeywell.HMIWeb
                 if (t == null)
                     continue;
                 var shapeSubObject = htmBindingNode.Id[(node.Id.Length + 1)..];
-                var shapeElement = xdocShape.Descendants("content").Where(x => x.Value.Contains($"id={shapeSubObject} ")).FirstOrDefault();
-                while (shapeElement.Name != "element")
-                {
-                    shapeElement = shapeElement.Parent;
-                }
+                var shapeElement = xdocShape.Descendants("content").Where(x => x.Value.Contains($"id={shapeSubObject} ")).FirstOrDefault()
+                    ?.AncestorsAndSelf("element").FirstOrDefault()
+                    ?? throw new InvalidOperationException($"Can't find the shape element for '{shapeSubObject}' in the shape file");
                 var shapeDataObjects = shapeElement.Descendants("dataobject");
 
                 var bindingId = ShapeBinding.GetIdFromHtml(htmBindingNode);

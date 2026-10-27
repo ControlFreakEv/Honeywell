@@ -41,7 +41,7 @@ namespace Honeywell.Parsers.TDC.Logic
             GateIndex = gateIndex;
             GateType = gateType;
 
-            Name = $"$HY{hwy.ToString("00")}B{box.ToString("00")}.LB({gateIndex.ToString("000")}{gateSuffix})";
+            Name = GetName(hwy, box, gateIndex, gateSuffix);
 
             TdcTag = new TdcTag(Name, "LOGICHG", fileName) { HWYNUM = hwy.ToString(), BOXNUM = box.ToString(), SLOTNUM = slot.ToString() };
             TdcTag.Logic = this;
@@ -49,6 +49,11 @@ namespace Honeywell.Parsers.TDC.Logic
             AddTdcParam("GateType", GateType.ToString());
 
             Honeywell.Parsers.TDC.Parser.TdcTags.Add(Name, TdcTag);
+        }
+
+        private static string GetName(int hwy, int box, int gateIndex, string? gateSuffix = null)
+        {
+            return $"$HY{hwy.ToString("00")}B{box.ToString("00")}.LB({gateIndex.ToString("000")}{gateSuffix})";
         }
 
         public void AddTdcParam(string name, string? value)
@@ -72,13 +77,17 @@ namespace Honeywell.Parsers.TDC.Logic
             LogicHgGate? logicHg = null;
 
             var logicLine = Regex.Replace(line.Trim(), @"\s+", " "); //replace extra spaces
-            if (logicLine.Length == 0 || logicLine[..2] == "--")
+            if (logicLine.Length == 0 || logicLine.StartsWith("--"))
                 return logicHg;
 
             var logicArray = logicLine.Split(' ');
 
             var gateIndex = GetIndex(logicArray[0]);
-            var gateType = GetLogicType(logicArray[1]);
+            var gateType = GetLogicType(GetValueFromArray(logicArray, 1));
+
+            // Same gate already parsed, e.g. a copy of the .js file in another subfolder
+            if (Honeywell.Parsers.TDC.Parser.TdcTags.ContainsKey(GetName(hwy, box, gateIndex)))
+                return logicHg;
 
             logicHg = new(hwy, box, slot, gateIndex, gateType, fileName);
 
@@ -120,13 +129,13 @@ namespace Honeywell.Parsers.TDC.Logic
             logicHg.AddTdcParam("Input3", logicHg.Input3);
             logicHg.AddTdcParam("Output1", logicHg.Output1);
             logicHg.AddTdcParam("Output2", logicHg.Output2);
-            logicHg.AddTdcParam("Output2", logicHg.Time);
+            logicHg.AddTdcParam("Time", logicHg.Time);
 
             logicHg.Input1Reverse = (logicHg.Input1 != null && logicHg.Input1[0] == '-');
             logicHg.Input2Reverse = (logicHg.Input2 != null && logicHg.Input2[0] == '-');
             logicHg.Input3Reverse = (logicHg.Input3 != null && logicHg.Input3[0] == '-');
-            logicHg.Output1Momentary = (logicHg.Output1 != null && logicHg.Output1[0] != '*');
-            logicHg.Output2Momentary = (logicHg.Output2 != null && logicHg.Output2[0] != '*');
+            logicHg.Output1Momentary = (logicHg.Output1 != null && logicHg.Output1[0] == '*');
+            logicHg.Output2Momentary = (logicHg.Output2 != null && logicHg.Output2[0] == '*');
 
             logicHg.Input1 = logicHg.Input1?.Trim('-');
             logicHg.Input2 = logicHg.Input2?.Trim('-');
@@ -141,7 +150,12 @@ namespace Honeywell.Parsers.TDC.Logic
         {
             int index;
 
-            var number = name[(name.IndexOf('(') + 1)..name.IndexOf(')')];
+            var start = name.IndexOf('(');
+            var end = name.IndexOf(')');
+            if (start < 0 || end <= start)
+                return -1;
+
+            var number = name[(start + 1)..end];
             if (!int.TryParse(number, out index))
                 index = -1;
 

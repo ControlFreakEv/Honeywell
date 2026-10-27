@@ -1,4 +1,5 @@
-﻿using Honeywell.Database;
+﻿using System.Globalization;
+using Honeywell.Database;
 using Microsoft.EntityFrameworkCore;
 using NPOI.SS.UserModel;
 using NPOI.XWPF.UserModel;
@@ -147,7 +148,7 @@ namespace Honeywell.GUI.Mapper
                     value = Activator.CreateInstance(type);
             }
 
-            return Convert.ChangeType(value, type);
+            return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
         }
 
         private static bool IsNullableHelper(Type memberType, MemberInfo? declaringType, IEnumerable<CustomAttributeData> customAttributes)

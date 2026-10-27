@@ -1,4 +1,5 @@
-﻿using Honeywell.Parsers.TDC.Logic;
+﻿using System.Globalization;
+using Honeywell.Parsers.TDC.Logic;
 using Honeywell.TDC;
 using Microsoft.Msagl.Drawing;
 using Honeywell.Parsers.TDC.Logic;
@@ -225,21 +226,21 @@ namespace Honeywell.Parsers.TDC.Graphs
             else if (parameter[..3] == "NN(")
             {
                 if (parameter == "NN(1)")
-                    return $"\n(PV={logicnim.NN1})";
+                    return $"\n(PV={logicnim.NN1?.ToString(CultureInfo.InvariantCulture)})";
                 else if (parameter == "NN(2)")
-                    return $"\n(PV={logicnim.NN2})";
+                    return $"\n(PV={logicnim.NN2?.ToString(CultureInfo.InvariantCulture)})";
                 else if (parameter == "NN(3)")
-                    return $"\n(PV={logicnim.NN3})";
+                    return $"\n(PV={logicnim.NN3?.ToString(CultureInfo.InvariantCulture)})";
                 else if (parameter == "NN(4)")
-                    return $"\n(PV={logicnim.NN4})";
+                    return $"\n(PV={logicnim.NN4?.ToString(CultureInfo.InvariantCulture)})";
                 else if (parameter == "NN(5)")
-                    return $"\n(PV={logicnim.NN5})";
+                    return $"\n(PV={logicnim.NN5?.ToString(CultureInfo.InvariantCulture)})";
                 else if (parameter == "NN(6)")
-                    return $"\n(PV={logicnim.NN6})";
+                    return $"\n(PV={logicnim.NN6?.ToString(CultureInfo.InvariantCulture)})";
                 else if (parameter == "NN(7)")
-                    return $"\n(PV={logicnim.NN7})";
+                    return $"\n(PV={logicnim.NN7?.ToString(CultureInfo.InvariantCulture)})";
                 else if (parameter == "NN(8)")
-                    return $"\n(PV={logicnim.NN8})";
+                    return $"\n(PV={logicnim.NN8?.ToString(CultureInfo.InvariantCulture)})";
             }
 
             return null;

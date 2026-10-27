@@ -264,27 +264,33 @@ namespace Honeywell.Parsers.TDC.Graphs
 
         private static void ExportToDb()
         {
+            // Capture user-entered data first: rebuilding the database regenerates every Id
+            var savedUserData = UserDataSnapshot.Capture();
             using var db = new TdcContext(true);
 
-            foreach (var tag in Parser.TdcTags.Values)
-                db.TdcTags.Add(new DbTdcTag(tag));
+            var dbTags = Parser.TdcTags.Values.Select(x => new DbTdcTag(x)).ToList();
+            db.TdcTags.AddRange(dbTags);
 
             foreach (var param in Parser.TdcParameters)
                 db.TdcParameters.Add(new DbTdcParameter(param));
 
             Parser.GetModules();
-            foreach (var module in Parser.Modules)
-                db.TdcModules.Add(new DbTdcModule(module));
+            var dbModules = Parser.Modules.Select(x => new DbTdcModule(x)).ToList();
+            db.TdcModules.AddRange(dbModules);
 
             var clrefId = 0;
+            var dbCls = new List<DbTdcCL>();
             foreach (var cl in Parser.TdcCL)
             {
                 var dbCl = new DbTdcCL(cl);
                 db.TdcCLs.Add(dbCl);
+                dbCls.Add(dbCl);
 
                 foreach (var tag in cl.TdcTags)
                     db.TdcCLRefs.Add(new DbTdcCLRefs(++clrefId, tag, cl));
             }
+
+            savedUserData.Restore(db, dbTags, dbModules, dbCls);
 
             var nodePk = 0;
             var crossCommId = 0;
@@ -358,6 +364,11 @@ namespace Honeywell.Parsers.TDC.Graphs
                     db.ParameterConnections.AddRange(dbconnections);
                     #endregion
                 }
+                // Module assignments made by hand in the graph view win over the parser's
+                foreach (var dbNode in dbNodes)
+                    if (savedUserData.TryGetModuleIdForNode(dbNode.NodeId, out var moduleId))
+                        dbNode.ModuleId = moduleId;
+
                 db.TdcNodes.AddRange(dbNodes);
                 #endregion
 

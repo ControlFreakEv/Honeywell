@@ -74,7 +74,15 @@ namespace Honeywell.GUI.Parser
             if (MapCheckBox.Checked)
             {
                 var searchOption = SubDirectoryCheckBox.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-                Parsers.TDC.Parser.ParseTdcFiles(ebPath, clPath, jsPath, customConnectionPath, clSlotsConnectionPath, MapCheckBox.Checked, searchOption);
+                try
+                {
+                    Parsers.TDC.Parser.ParseTdcFiles(ebPath, clPath, jsPath, customConnectionPath, clSlotsConnectionPath, MapCheckBox.Checked, searchOption);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message, "Parse failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
                 ImportFileRefs();
                 MessageBox.Show($"Maps generated at \n{TdcContext.ParserConnectionString}");
             }

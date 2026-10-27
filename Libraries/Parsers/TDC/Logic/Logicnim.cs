@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,21 +44,21 @@ namespace Honeywell.Parsers.TDC.Logic
             Tag = tdcTag;
             Name = tdcTag.Name;
 
-            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(1)")?.Value, out float _NN1))
+            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(1)")?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float _NN1))
                 NN1 = _NN1;
-            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(2)")?.Value, out float _NN2))
+            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(2)")?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float _NN2))
                 NN2 = _NN2;
-            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(3)")?.Value, out float _NN3))
+            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(3)")?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float _NN3))
                 NN3 = _NN3;
-            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(4)")?.Value, out float _NN4))
+            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(4)")?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float _NN4))
                 NN4 = _NN4;
-            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(5)")?.Value, out float _NN5))
+            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(5)")?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float _NN5))
                 NN5 = _NN5;
-            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(6)")?.Value, out float _NN6))
+            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(6)")?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float _NN6))
                 NN6 = _NN6;
-            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(7)")?.Value, out float _NN7))
+            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(7)")?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float _NN7))
                 NN7 = _NN7;
-            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(8)")?.Value, out float _NN8))
+            if (float.TryParse(tdcTag.Params.FirstOrDefault(x => x.Name == "NN(8)")?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float _NN8))
                 NN8 = _NN8;
 
             for (int i = 1; i < 25; i++)

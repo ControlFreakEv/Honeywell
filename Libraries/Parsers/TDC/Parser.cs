@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 using System.IO;
 using System.Text;
 using Honeywell.Parsers.TDC.Logic;
@@ -366,8 +367,8 @@ namespace Honeywell.Parsers.TDC
                             paramValue = null;
                         else if (paramValue.Contains('_') && (string.IsNullOrWhiteSpace(paramValue.Trim('_')) || paramValue.Trim('_') == ".")) //_______ or ____.____
                             paramValue = null;
-                        else if (double.TryParse(paramValue, out double number))
-                            paramValue = number.ToString(); //removes trailing 0's
+                        else if (double.TryParse(paramValue, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
+                            paramValue = number.ToString(CultureInfo.InvariantCulture); //removes trailing 0's
 
                         if (paramName == "OENTNUMP")
                             group.OENTNUMP = int.Parse(paramValue);
@@ -433,8 +434,8 @@ namespace Honeywell.Parsers.TDC
                             paramValue = null;
                         else if (paramValue.Contains('_') && (string.IsNullOrWhiteSpace(paramValue.Trim('_')) || paramValue.Trim('_') == ".")) //_______ or ____.____
                             paramValue = null;
-                        else if (double.TryParse(paramValue, out double number))
-                            paramValue = number.ToString(); //removes trailing 0's
+                        else if (double.TryParse(paramValue, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
+                            paramValue = number.ToString(CultureInfo.InvariantCulture); //removes trailing 0's
 
                         TdcParameter tdcParam = new(tdcTag, paramName, paramValue, valueCaptures[i].Value);
                         if (!tdcTag.Params.Where(x => x.Name == tdcParam.Name).Any())

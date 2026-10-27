@@ -1,4 +1,5 @@
-﻿using Honeywell.TDC;
+﻿using System.Globalization;
+using Honeywell.TDC;
 using Microsoft.Msagl.Drawing;
 using NPOI.HPSF;
 using System;
@@ -225,8 +226,8 @@ namespace Honeywell.GUI.Mapper.Forms.Tools
                 else if (paramValue == "EU")
                 {
                     var deadband = tag.Params.FirstOrDefault(x => x.Name == "PVALDBEU")?.Value;
-                    if (double.TryParse(deadband, out var value))
-                        return value.ToString();
+                    if (double.TryParse(deadband, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+                        return value.ToString(CultureInfo.InvariantCulture);
                     else
                         return "0";
                 }
@@ -235,7 +236,7 @@ namespace Honeywell.GUI.Mapper.Forms.Tools
             }
             else if (paramName == "PVALDBEU")
             {
-                if (double.TryParse(paramValue, out var value))
+                if (double.TryParse(paramValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
                     return "EU";
                 else
                     return "PERCENT";

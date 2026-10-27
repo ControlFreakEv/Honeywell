@@ -475,14 +475,9 @@ namespace Honeywell.GUI.ExperionGfx
                                         var dataPoint = propertyAttributes.Where(x => x.Value == "PointRefPointName").FirstOrDefault()?.Parent?.Attributes("value")?.FirstOrDefault()?.Value.ToStringOrNull();
                                         var dataParameter = propertyAttributes.Where(x => x.Value == "PointRefParamName").FirstOrDefault()?.Parent?.Attributes("value")?.FirstOrDefault()?.Value.ToStringOrNull();
 
-                                        if (dataPoint != null || dataParameter != null)
+                                        var elementNode = dataObject.Ancestors("element").FirstOrDefault();
+                                        if (elementNode != null && (dataPoint != null || dataParameter != null))
                                         {
-                                            var elementNode = dataObject.Parent;
-                                            while (elementNode?.Name != "element")
-                                            {
-                                                elementNode = elementNode?.Parent;
-                                            }
-
                                             var contentNode = elementNode.Descendants("content").FirstOrDefault();
                                             var shapeId = CustomShape.GetShapeId(contentNode?.Value);
 
@@ -498,23 +493,19 @@ namespace Honeywell.GUI.ExperionGfx
                                         var scriptPoints = propertyAttributes.Where(x => x.Value == "CommaDelimitedPointNames").FirstOrDefault()?.Parent?.Attributes("value")?.FirstOrDefault()?.Value.ToStringOrNull()?.Split(',');
                                         var scriptParameters = propertyAttributes.Where(x => x.Value == "CommaDelimitedParameters").FirstOrDefault()?.Parent?.Attributes("value")?.FirstOrDefault()?.Value.ToStringOrNull()?.Split(',');
 
-                                        if (scriptPoints != null && scriptParameters != null)
+                                        var elementNode = dataObject.Ancestors("element").FirstOrDefault();
+                                        if (elementNode != null && scriptPoints != null && scriptParameters != null)
                                         {
                                             for (int i = 0; i < scriptPoints.Length; i++)
                                             {
-                                                if (scriptPoints[i].ToStringOrNull() != null || scriptParameters[i].ToStringOrNull() != null)
+                                                var scriptParameter = i < scriptParameters.Length ? scriptParameters[i] : null;
+                                                if (scriptPoints[i].ToStringOrNull() != null || scriptParameter?.ToStringOrNull() != null)
                                                 {
-                                                    var elementNode = dataObject.Parent;
-                                                    while (elementNode?.Name != "element")
-                                                    {
-                                                        elementNode = elementNode?.Parent;
-                                                    }
-
                                                     var contentNode = elementNode.Descendants("content").FirstOrDefault();
                                                     var shapeId = CustomShape.GetShapeId(contentNode?.Value);
 
                                                     var customPropPoint = CustomShape.GetCustomProperty(scriptPoints[i]);
-                                                    var customPropParam = CustomShape.GetCustomProperty(scriptParameters[i]);
+                                                    var customPropParam = CustomShape.GetCustomProperty(scriptParameter);
 
                                                     var customShape = new CustomShape { ShapeName = customShapeName, SubShapeName = shapeId, PointName = customPropPoint, ParameterName = customPropParam, DataType = Shape.ObjectType.ScriptTab, CsvIndex = i };
                                                     customShapeList.Add(customShape);
@@ -989,12 +980,12 @@ namespace Honeywell.GUI.ExperionGfx
                                 {
                                     if (shape.Point != null && shape.NewPoint != null)
                                     {
-                                        node.InnerHtml = node.InnerHtml.Replace(shape.Point, shape.NewPoint, StringComparison.OrdinalIgnoreCase);
+                                        node.InnerHtml = node.InnerHtml.ReplaceWholeName(shape.Point, shape.NewPoint);
                                     }
                                         
 
                                     if (shape.Parameter != null && shape.NewParameter != null)
-                                        node.InnerHtml = node.InnerHtml.Replace(shape.Parameter, shape.NewParameter, StringComparison.OrdinalIgnoreCase);
+                                        node.InnerHtml = node.InnerHtml.ReplaceWholeName(shape.Parameter, shape.NewParameter);
                                 }
 
                             }
