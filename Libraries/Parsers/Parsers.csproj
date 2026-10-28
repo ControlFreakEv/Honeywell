@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Honeywell.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Models\Database\Database.csproj" />
     <ProjectReference Include="..\..\Models\TDC\TDC.csproj" />
   </ItemGroup>

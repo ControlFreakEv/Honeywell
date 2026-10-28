@@ -921,7 +921,11 @@ namespace Honeywell.Parsers.TDC
 
         public static List<TdcTag> ParseTdcFiles(string ebFolderPath, string? clFolderPath, string? jsFolderPath, string? customConnectionsPath, string? clSlotsConnectionPath, bool createGraphs, SearchOption searchOption = SearchOption.TopDirectoryOnly)
         {
+            // Start from a clean slate so a second parse in the same session doesn't duplicate the first
             TdcTags.Clear();
+            TdcParameters.Clear();
+            TdcCL.Clear();
+            Modules.Clear();
 
             if (createGraphs)
                 GraphFactory.Clear();

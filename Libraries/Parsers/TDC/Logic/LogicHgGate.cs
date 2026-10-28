@@ -83,6 +83,9 @@ namespace Honeywell.Parsers.TDC.Logic
             var logicArray = logicLine.Split(' ');
 
             var gateIndex = GetIndex(logicArray[0]);
+            if (gateIndex < 0) //not a gate line, e.g. no LB(n)
+                return logicHg;
+
             var gateType = GetLogicType(GetValueFromArray(logicArray, 1));
 
             // Same gate already parsed, e.g. a copy of the .js file in another subfolder

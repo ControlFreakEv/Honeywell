@@ -20,16 +20,7 @@ if (targetFiles.Length == 0)
 
 foreach (var targetFile in targetFiles)
 {
-    // Stale side files from an older target would be replayed against the new database
-    foreach (var suffix in new[] { "-shm", "-wal" })
-        if (File.Exists(targetFile + suffix))
-            File.Delete(targetFile + suffix);
-
-    File.Copy(sourceFile, targetFile, true);
-    foreach (var suffix in new[] { "-shm", "-wal" })
-        if (File.Exists(sourceFile + suffix))
-            File.Copy(sourceFile + suffix, targetFile + suffix, true);
-
+    CopyDB.DbCopier.Copy(sourceFile, targetFile);
     Console.WriteLine($"Copied {sourceFile} -> {targetFile}");
 }
 

@@ -191,6 +191,7 @@ namespace Honeywell.Parsers.TDC.Graphs
         public static void Clear()
         {
             Forest = new Graph();
+            Trees.Clear();
             TreeDict.Clear();
         }
 

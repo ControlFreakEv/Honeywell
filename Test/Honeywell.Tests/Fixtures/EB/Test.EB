@@ -1,0 +1,14 @@
+&T REGAM
+&N FIC100
+PTDESC = "Flow controller"
+HWYNUM = 1
+BOXNUM = 9
+SLOTNUM = 1
+PVEUHI = 12.50
+PKGNAME(1) = "Sample"
+&T LOGICNIM
+&N LOG100
+PTDESC = "Logic"
+HWYNUM = 1
+NN(1) = 3.75
+L(1) = FIC100.PV
