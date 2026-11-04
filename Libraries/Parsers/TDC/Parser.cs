@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
-using Honeywell.TDC;
+﻿using Honeywell.TDC;
 using Honeywell.Parsers.TDC.Graphs;
 using Honeywell.Parsers.TDC.Logic;
 using Microsoft.Msagl.Drawing;
@@ -105,7 +103,7 @@ namespace Honeywell.Parsers.TDC
         /// <summary>Adds a parameter the parser worked out itself, so it has no separate raw text.</summary>
         private static void AddParameter(TdcTag tag, string name, string? value)
         {
-            var parameter = new TdcParameter(tag, name, value, value);
+            var parameter = new TdcParameter(tag, name, value, value ?? string.Empty);
             tag.Params.Add(parameter);
             TdcParameters.Add(parameter);
         }

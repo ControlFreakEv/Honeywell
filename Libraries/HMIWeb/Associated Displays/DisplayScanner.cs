@@ -251,7 +251,7 @@ namespace Honeywell.HMIWeb
 
             shape.ShapeSource = Path.GetFileName(src.Value);
             if (shape.ShapePath?.Contains(PathSeparator) == true)
-                ApplyCustomParameter(shape, src.Value, customShapes);
+                ApplyCustomParameter(shape, src.Value ?? string.Empty, customShapes);
         }
 
         /// <summary>The reference is inside a custom shape, so look up which custom properties it uses.</summary>

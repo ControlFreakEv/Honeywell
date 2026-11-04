@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Data;
 using Honeywell.Database;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Honeywell.GUI.Mapper.Forms
 {
@@ -45,7 +35,6 @@ namespace Honeywell.GUI.Mapper.Forms
             sd.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
             sd.RestoreDirectory = true;
             sd.DefaultExt = "xlsx";
-            //sd.CheckFileExists = true;
             sd.CheckPathExists = true;
 
             if (sd.ShowDialog() == DialogResult.OK)

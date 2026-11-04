@@ -1,12 +1,7 @@
 ﻿using Mapper.Samples;
 using ScintillaNET;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 //todo: convert regex to GeneratedRegex() attribute
 //todo: test the following line -> BLOCK Level (GENERIC $reg_ctl; AT PV_ALG)
@@ -24,7 +19,6 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
         public const int Symbol = 6;
         public const int Local = 7;
         public const int External = 8;
-        //public const int Parameter { get; } = 9;
         public const int Label = 10;
         public const int Type = 11;
         public const int Function = 12;
@@ -218,8 +212,6 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
                 switch (state)
                 {
                     case STATE_UNKNOWN:
-                        //if (c == '"')
-                        //    break;
                         if (c == '"')
                         {
                             // Start of "string"
@@ -511,10 +503,6 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
 
         private void ParseText(string text)
         {
-            //var regexSetpoint = new Regex(@"(?<!(--.*))\bSETPOINT\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-            //var regexCds = new Regex(@"(?<!(--.*))\bCUSTOM\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-            //var regexParamList = new Regex(@"(?<!(--.*))\bPARAM_LIST\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-            //var regexPackage = new Regex(@"(?<!(--.*))\bPACKAGE\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
             var regexExternalMatches = regexExternal.Matches(text);
             foreach (Match match in regexExternalMatches)
             {
@@ -705,7 +693,6 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
                         if (groupName == "TempIndent")
                             indentNumber++;
 
-                        //if (string.Equals(prettyRegexMatch.Value, "END", StringComparison.OrdinalIgnoreCase))
                         //    indentNumber = 0; //todo: add package, end isn't necassirly 0 indent
                         if (indentNumber > 0)
                             trimmedLine = new string('\t', indentNumber) + trimmedLine;

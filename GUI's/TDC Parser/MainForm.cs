@@ -1,7 +1,5 @@
 using Honeywell.Database;
-using Honeywell.Parsers.TDC;
 using Parser;
-using System.Diagnostics;
 
 namespace Honeywell.GUI.Parser
 {

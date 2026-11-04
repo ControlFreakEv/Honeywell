@@ -1,19 +1,8 @@
 ﻿using Honeywell.Database;
 using Microsoft.Msagl.Core.Geometry.Curves;
-//using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Drawing;
 using Microsoft.Msagl.GraphViewerGdi;
-using Microsoft.Msagl.Layout.Layered;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 
@@ -26,7 +15,6 @@ namespace Honeywell.GUI.Mapper
         public CheckBox DirectConnectionsCheckBox;
         ToolStripButton saveButton;
         object? selectedObject;
-        //AttributeBase? selectedObjectAttr;
         readonly Dictionary<object, Microsoft.Msagl.Drawing.Color> draggedObjectOriginalColors = new();
         bool isZoomRectangle = false;
         bool isMouseWheelPan = false;
@@ -43,7 +31,6 @@ namespace Honeywell.GUI.Mapper
             InitializeComponent();
             var toolbar = (ToolStrip)gViewer.Controls["toolbar"]!;
 
-            //GraphViewer.AsyncLayout = true;
             gViewer.MouseWheel += GraphViewer_MouseWheel;
             gViewer.LayoutEditor.DecorateObjectForDragging = SetDragDecorator;
             gViewer.LayoutEditor.RemoveObjDraggingDecorations = RemoveDragDecorator;
@@ -300,7 +287,6 @@ namespace Honeywell.GUI.Mapper
             gViewer.Graph = gViewer.Graph;
             gViewer.NeedToCalculateLayout = false;
             //GraphViewer.AsyncLayout = false; //todo: set this back to true?
-            //GraphViewer.Graph = GraphViewer.Graph;
         }
 
         private void UnGroupBtn_Click(object? sender, EventArgs e)
@@ -454,7 +440,6 @@ namespace Honeywell.GUI.Mapper
                 selectedObject = gViewer.ObjectUnderMouseCursor?.DrawingObject;
                 if (selectedObject is Edge selectedEdge)
                 {
-                    //selectedObjectAttr = selectedEdge.Attr.Clone();
                     selectedEdge.Attr.Color = Microsoft.Msagl.Drawing.Color.Blue;
                     gViewer.Invalidate(e.NewObject);
                     var parameters = selectedEdge.LabelText.Split("->");
@@ -462,7 +447,6 @@ namespace Honeywell.GUI.Mapper
                 }
                 else if (selectedObject is Node selectedNode)
                 {
-                    //selectedObjectAttr = ((Node)GraphViewer.SelectedObject).Attr.Clone();
                     selectedNode.Attr.Color = Microsoft.Msagl.Drawing.Color.Blue;
                     gViewer.SetToolTip(selectedObjectToolTip, selectedNode.LabelText);
                     gViewer.Invalidate(e.NewObject);
@@ -482,7 +466,6 @@ namespace Honeywell.GUI.Mapper
                 gViewer.PanButtonPressed = true;
                 mouseDownTransform = gViewer.Transform.Clone();
 
-                //GraphViewer.Cursor = new Cursor(a.GetManifestResourceStream(a.GetManifestResourceNames().First(x => x.Contains("hmove.cur"))));
 
                 mouseDownPoint = new Point(e.X, e.Y);
             }

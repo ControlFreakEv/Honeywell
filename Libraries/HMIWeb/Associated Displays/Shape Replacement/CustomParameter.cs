@@ -36,7 +36,6 @@ namespace Honeywell.HMIWeb
         public static List<CustomParameter> GetListOfCustomParameters(string htmParameters)
         {
             var customParameters = new List<CustomParameter>();
-            //var shapeParameters = htmParameters.Split(';');
             var matches = regexCustomParameter.Matches(htmParameters);
             for (int i = 0; i < matches.Count; i++)
             {
@@ -54,16 +53,7 @@ namespace Honeywell.HMIWeb
                 }
                 customParameters.Add(new CustomParameter(name, type, value));
             }
-            //foreach (var shapeParameter in shapeParameters)
-            //{
-            //    if (string.IsNullOrWhiteSpace(shapeParameter))
-            //        continue;
-            //    var type = shapeParameter[..shapeParameter.IndexOf("?")];
-            //    var name = shapeParameter[(type.Length + 1)..shapeParameter.IndexOf(":")];
-            //    var value = shapeParameter[(shapeParameter.IndexOf(":") + 1)..];
 
-            //    customParameters.Add(new CustomParameter(name, type, value));
-            //}
             return customParameters;
         }
     }

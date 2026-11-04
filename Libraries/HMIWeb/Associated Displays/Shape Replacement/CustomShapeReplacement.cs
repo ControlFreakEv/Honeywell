@@ -46,7 +46,6 @@ namespace Honeywell.HMIWeb
             var customParameters = CustomParameter.GetListOfCustomParameters(shapeParameters);
 
             var bindingList = new List<ShapeBinding>();
-            //var htmBindingNodes = node.SelectNodes(xPathBinding);
             var htmBindingNodes = node.DescendantsAndSelf();
             foreach (var htmBindingNode in htmBindingNodes)
             {
@@ -313,7 +312,6 @@ namespace Honeywell.HMIWeb
                             var value = embeddedParam.Groups["CustomProperty"].Value.ToUpper();
                             var newInnerText = customParameters.FirstOrDefault(x => x.Name.ToUpper() == value && x.Type.ToUpper() == type)?.Value
                                 ?? throw new InvalidOperationException($"Shape '{newPrefix}' has no custom parameter '{type}::{value}' for embedded node '{htmId}'");
-                            //var oldInnerText = NewCustomParameters.FirstOrDefault(x => x.Name.ToUpper() == value && x.Type.ToUpper() == type).Value;
                             embeddedNode.InnerHtml = newInnerText;
                         }
                     }
@@ -409,8 +407,6 @@ namespace Honeywell.HMIWeb
                 lastBinding = newbinding.BindingElement;
                 newBindings.Add(newbinding);
             }
-            //xdocBinding.Save(bindingsPath);
-            //xdocDsd.Save(dsdPath);
             return newBindings;
         }
 

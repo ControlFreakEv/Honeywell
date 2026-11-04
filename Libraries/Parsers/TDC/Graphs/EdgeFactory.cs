@@ -1,10 +1,5 @@
 ﻿using Honeywell.TDC;
 using Microsoft.Msagl.Drawing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Honeywell.Parsers.TDC.Graphs
 {
@@ -26,8 +21,6 @@ namespace Honeywell.Parsers.TDC.Graphs
             edge.Label.FontSize = FontSize;
             edge.Attr.Color = Color.White;
             edge.Label.FontColor = Color.White;
-            //if (edge.LabelText.Contains("LISRC") && edge.TargetNode.LabelText.Contains("LOGICNIM"))
-            //    edge = edge;
 
             return edge;
         }

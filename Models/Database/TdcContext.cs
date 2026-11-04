@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 
 namespace Honeywell.Database
 {
@@ -37,7 +35,6 @@ namespace Honeywell.Database
         {
             if (string.IsNullOrWhiteSpace(ConnectionString))
             {
-                //ConnectionString = Path.Join(AppDomain.CurrentDomain.BaseDirectory, "TDC.db");
                 ConnectionString = ParserConnectionString;
                 Server = false;
             }
@@ -206,7 +203,6 @@ namespace Honeywell.Database
 
                 entity.Property(e => e.CLAttachedToThisPoint);
 
-                //entity.Property(e => e.PacakgeInstance).IsRequired(false);
 
                 entity.HasOne(d => d.Tag)
                 .WithMany(p => p.CLTagReferences)

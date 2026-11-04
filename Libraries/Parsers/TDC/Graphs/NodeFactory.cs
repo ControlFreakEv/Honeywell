@@ -2,11 +2,6 @@
 using Honeywell.Parsers.TDC.Logic;
 using Honeywell.TDC;
 using Microsoft.Msagl.Drawing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Honeywell.Parsers.TDC.Graphs
 {

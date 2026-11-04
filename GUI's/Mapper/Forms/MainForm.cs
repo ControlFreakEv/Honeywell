@@ -2,15 +2,8 @@
 using WeifenLuo.WinFormsUI.Docking;
 using Honeywell.Database;
 using Honeywell.GUI.Mapper.ScintillaExt;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using Honeywell.TDC;
 using Honeywell.GUI.Mapper.Properties;
 using Honeywell.GUI.Mapper.Forms;
-using System.Reflection;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Windows.Forms;
-using Zuby.ADGV;
-using Microsoft.Msagl.Core.DataStructures;
 using System.Diagnostics;
 using Mapper.Samples;
 
@@ -41,7 +34,6 @@ namespace Honeywell.GUI.Mapper
             InitializeComponent();
 
             dockPanel.Theme = new VS2015DarkTheme();
-            //dockPanel.Theme = new VS2013DarkTheme();
             SetupDockContent();
         }
 

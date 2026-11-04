@@ -1,12 +1,5 @@
 ﻿using Honeywell.Database;
-using Honeywell.TDC;
 using Mapper.Samples;
-using System;
-using System.Collections.Generic;
-using System.IO.Packaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Honeywell.GUI.Mapper
 {

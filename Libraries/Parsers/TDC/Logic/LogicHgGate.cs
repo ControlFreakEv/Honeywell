@@ -1,11 +1,5 @@
-﻿using Honeywell.Parsers.TDC.Logic;
-using Honeywell.TDC;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Honeywell.TDC;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using static Honeywell.Parsers.TDC.Logic.LogicHgTypes;
 
 namespace Honeywell.Parsers.TDC.Logic

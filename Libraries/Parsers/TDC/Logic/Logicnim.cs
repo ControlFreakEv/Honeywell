@@ -1,15 +1,8 @@
 ﻿using System.Globalization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
 using static Honeywell.Parsers.TDC.Logic.LogicNimTypes;
 using Microsoft.Msagl.Drawing;
 using Honeywell.Parsers.TDC.Graphs;
 using Honeywell.TDC;
-//using Microsoft.Msagl.Core.Layout;
 
 namespace Honeywell.Parsers.TDC.Logic
 {
@@ -702,8 +695,6 @@ namespace Honeywell.Parsers.TDC.Logic
                 if (LODSTN?.Value == null)
                     continue;
 
-                //if (!IsOff(LOENBL?.Value))
-                //{
                 (var sourceNode, var sourceParamName) = GetNodeLOSRC(LOSRC);
                 (var targetNodes, var targetParamName) = GetNodeLODSTN(LODSTN);
 
@@ -723,7 +714,6 @@ namespace Honeywell.Parsers.TDC.Logic
                         if (pushNode != null && targetNode != null)
                             EdgeFactory.AddEdge(pushNode.Id, $"{pushParamName}-> {targetParamName}", targetNode.Id); //push
                     }
-                    //}
                 }
             }
             #endregion

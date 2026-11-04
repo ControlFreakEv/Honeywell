@@ -1,25 +1,13 @@
 ﻿using Honeywell.Database;
 using ScintillaNET;
 using ScintillaNET_FindReplaceDialog;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using Honeywell.GUI.Mapper.ScintillaExt;
-using static System.Net.Mime.MediaTypeNames;
-using System.Collections;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Diagnostics;
-using Honeywell.TDC;
 using System.Text.RegularExpressions;
-using System.Net.Mail;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Mapper.Samples;
 
 namespace Honeywell.GUI.Mapper
@@ -28,7 +16,6 @@ namespace Honeywell.GUI.Mapper
     //todo: chaning indicators, add "*" to save
     public partial class CLViewerForm : DockContent
     {
-        //public ScintillaExt.ScintillaTextEditor ScintillaTextEditorCL { get; set; }
         #region Fields
         public static FindReplace MyFindReplace { get; set; } = new();
         private static Dictionary<string, int> IndicatorDict = new();
@@ -91,7 +78,6 @@ namespace Honeywell.GUI.Mapper
 
             OpenFile(dbTdcCL.Content);
 
-            //MyFindReplace = new FindReplace();
             MyFindReplace.Scintilla = ScintillaTextEditorCL;
             MyFindReplace.KeyPressed += MyFindReplace_KeyPressed;
 
@@ -164,20 +150,17 @@ namespace Honeywell.GUI.Mapper
             var scintilla = (ScintillaTextEditor)sender;
             var startPos = scintilla.GetEndStyled();
             var endPos = e.Position;
-            //var debug = scintilla.GetTextRange(startPos, endPos);
             Lexer.Style(scintilla, startPos, endPos);
         }
 
         private void InitBookmarkMargin()
         {
-            //TextArea.SetFoldMarginColor(true, IntToColor(BACK_COLOR));
 
             var margin = ScintillaTextEditorCL.Margins[BOOKMARK_MARGIN];
             margin.Width = 20;
             margin.Sensitive = true;
             margin.Type = MarginType.Symbol;
             margin.Mask = (1 << BOOKMARK_MARKER);
-            //margin.Cursor = MarginCursor.Arrow;
 
             var marker = ScintillaTextEditorCL.Markers[BOOKMARK_MARKER];
             marker.Symbol = MarkerSymbol.Circle;
@@ -226,7 +209,6 @@ namespace Honeywell.GUI.Mapper
             ScintillaTextEditorCL.CaretForeColor = Color.White;
             ScintillaTextEditorCL.SelectionBackColor = IntToMediaColor(0x114D9C);
 
-            //FindReplace.Indicator.ForeColor = System.Drawing.Color.DarkOrange;
         }
 
         private void InitNumberMargin()
@@ -348,28 +330,17 @@ namespace Honeywell.GUI.Mapper
             InitCodeFolding();
 
             // Turn on line numbers?
-            //if (lineNumbersMenuItem.IsChecked)
-            //    ScintillaTextEditorCL.Margins[NUMBER_MARGIN].Width = LINE_NUMBERS_MARGIN_WIDTH;
-            //else
                 ScintillaTextEditorCL.Margins[NUMBER_MARGIN].Width = 0;
 
             // Turn on white space?
-            //if (whitespaceMenuItem.IsChecked)
-            //    ScintillaTextEditorCL.ViewWhitespace = WhitespaceMode.VisibleAlways;
-            //else
                 ScintillaTextEditorCL.ViewWhitespace = WhitespaceMode.Invisible;
 
             // Turn on word wrap?
-            //if (wordWrapMenuItem.IsChecked)
-            //    ScintillaTextEditorCL.WrapMode = WrapMode.Word;
-            //else
                 ScintillaTextEditorCL.WrapMode = WrapMode.None;
 
             // Show EOL?
-            //ScintillaTextEditorCL.ViewEol = endOfLineMenuItem.IsChecked;
 
             // Set the zoom
-            //ScintillaTextEditorCL.Zoom = _zoomLevel;
 
             ScintillaTextEditorCL.Indicators[0].ForeColor = OrangeToolStripTextBox.BackColor;
             ScintillaTextEditorCL.Indicators[0].Style = IndicatorStyle.RoundBox;
@@ -438,12 +409,6 @@ namespace Honeywell.GUI.Mapper
                 SaveFile();
                 e.SuppressKeyPress = true;
             }
-            //else if (e.Control && e.KeyCode == System.Windows.Forms.Keys.G)
-            //{
-            //    GoTo MyGoTo = new GoTo((Scintilla)sender);
-            //    MyGoTo.ShowGoToDialog();
-            //    e.SuppressKeyPress = true;
-            //}
         }
 
         private void UpdateEbParameters(Scintilla? scintilla)
@@ -467,7 +432,6 @@ namespace Honeywell.GUI.Mapper
 
         private string GetTagName(Scintilla scintilla, int pos)
         {
-            //var pos = scintilla.CurrentPosition;
             var wordStart = scintilla.WordStartPosition(pos, true);
             var style = scintilla.GetStyleAt(wordStart);
 
@@ -591,8 +555,6 @@ namespace Honeywell.GUI.Mapper
 
             if (parameter != null)
             {
-                //if (parameter.ParamList != null)
-                //    tooltip += $"Defined in PARAM_LIST {parameter.ParamList}";
 
                 if (parameter.Type != null)
                 {

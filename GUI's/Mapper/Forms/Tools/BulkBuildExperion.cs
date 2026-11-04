@@ -1,12 +1,5 @@
 ﻿using System.Globalization;
 using Honeywell.TDC;
-using Microsoft.Msagl.Drawing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Honeywell.GUI.Mapper.Forms.Tools
 {
@@ -251,14 +244,6 @@ namespace Honeywell.GUI.Mapper.Forms.Tools
                 }
                 else
                 {
-                    //if (paramValue == "JTHERM")
-                    //    return 5;
-                    //else if (paramValue == "KTHERM")
-                    //    return 5;
-                    //else if (paramValue == "ETHERM")
-                    //    return 5;
-                    //else if (paramValue == "TTHERM")
-                    //    return 5;
                 }
             }
             else if (paramName == "PVCLAMP")

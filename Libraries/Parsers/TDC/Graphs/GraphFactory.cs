@@ -1,15 +1,6 @@
 ﻿using Honeywell.Parsers.TDC.Logic;
 using Microsoft.Msagl.Drawing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
-//using Database;
-using Microsoft.Msagl.Layout.LargeGraphLayout;
 using Honeywell.TDC;
 using Honeywell.Database;
 
@@ -315,7 +306,7 @@ namespace Honeywell.Parsers.TDC.Graphs
                         ModuleId = (userData == null) ? null : Parser.TdcTags[userData.Name].Module?.Id
                     };
 
-                    //if broken up logic block with 1 target connection, move into taget module
+                    // A broken-up logic block with one target connection moves into the target module
                     AssignLogicBlockModule(graph, dbNodes, userData);
                     dbNodes.Add(dbNode);
 

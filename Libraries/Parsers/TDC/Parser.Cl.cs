@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.RegularExpressions;
 using Honeywell.TDC;
 using Honeywell.Parsers.TDC.Logic;

@@ -1,13 +1,5 @@
-﻿using Honeywell.Database;
-using Mapper.Samples;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Zuby.ADGV;
 
 namespace Honeywell.GUI.Mapper
