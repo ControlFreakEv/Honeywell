@@ -535,7 +535,7 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
             var regexLocalMatches = regexLocal.Matches(text);
             foreach (Match match in regexLocalMatches)
             {
-                string type = null;
+                string? type = null;
 
                 if (match.Groups["type"].Success)
                     type = match.Groups["type"].Captures[0].Value.Trim();
@@ -557,7 +557,7 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
             if (regexSubParametersMatch.Success)
             {
                 string paramName;
-                string type = null;
+                string? type = null;
                 var parameters = regexSubParametersMatch.Groups["arguments"].Value.Split(';');
                 foreach (var param in parameters)
                 {
@@ -600,8 +600,8 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
             var regexParameterListMatches = regexParamList.Matches(text);
             foreach (Match match in regexParameterListMatches)
             {
-                string paramList = null;
-                string type = null;
+                string? paramList = null;
+                string? type = null;
                 if (match.Groups["paramlist"].Success)
                     paramList = match.Groups["paramlist"].Captures[0].Value;
 
@@ -625,7 +625,7 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
             {
                 var enumName = match.Groups["name"].Captures[0].Value;
                 var enumValueArray = match.Groups["value"].Captures[0].Value.Split('/');
-                string enumValue = null;
+                string? enumValue = null;
 
                 for (int i = 0; i < enumValueArray.Length; i++)
                 {
@@ -653,7 +653,7 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
 
             using (StringReader reader = new StringReader(text))
             {
-                string line = string.Empty;
+                string? line = string.Empty;
                 do
                 {
                     line = reader.ReadLine();

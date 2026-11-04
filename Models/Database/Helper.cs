@@ -31,7 +31,7 @@ namespace Honeywell.Database
             return address;
         }
 
-        public static string GetLcnAddress(TdcTag? tag)
+        public static string GetLcnAddress(TdcTag tag)
         {
             return GetLcnAddress(new DbTdcTag(tag));
         }
@@ -104,7 +104,7 @@ namespace Honeywell.Database
             return address;
         }
 
-        public static string GetLcnAddressForNodeLabel(TdcTag? tag)
+        public static string GetLcnAddressForNodeLabel(TdcTag tag)
         {
             return GetLcnAddressForNodeLabel(new DbTdcTag(tag));
         }
@@ -251,8 +251,8 @@ namespace Honeywell.Database
                 masterGraph.CreateGeometryGraph();
                 masterGraph.GeometryGraph.UpdateBoundingBox();
 
-                var startNode = masterGraph?.Nodes.FirstOrDefault(node => node.Id == bfsTag);
-                if (directConnections)
+                var startNode = masterGraph.Nodes.FirstOrDefault(node => node.Id == bfsTag);
+                if (directConnections && startNode != null)
                 {
                     var directNodes = new List<Node>();
                     directNodes.AddRange(startNode.InEdges.Select(x => x.SourceNode));
@@ -355,42 +355,6 @@ namespace Honeywell.Database
         }
 
         //todo: see NULL_SW around 16/17 nodes.
-        private static List<Node> BFS2(Node startNode, Graph graph)
-        {
-            var bfsNodes = new List<Node>();
-            var visited = new Dictionary<Node, int?>();
-            foreach (var node in graph.Nodes)
-                visited.Add(node, null);
-
-            var queue = new Queue<Node>();
-
-            CheckBFSNode2(startNode, visited, queue, 0);
-
-            while (queue.Any())
-            {
-                var node = queue.Dequeue();
-
-                int depth = (int)visited[node] + 1;
-                foreach (var edge in node.Edges)
-                {
-                    CheckBFSNode2(edge.SourceNode, visited, queue, depth);
-                    CheckBFSNode2(edge.TargetNode, visited, queue, depth);
-                }
-            }
-
-            foreach (var kv in visited.OrderBy(x => x.Value))
-                bfsNodes.Add(kv.Key);
-            return bfsNodes;
-        }
-
-        private static void CheckBFSNode2(Node node, Dictionary<Node, int?> visited, Queue<Node> queue, int depth)
-        {
-            if (visited[node] != null)
-            {
-                visited[node] = depth;
-                queue.Enqueue(node);
-            }
-        }
 
         /// <summary>
         /// Updates all modules in graphs.
@@ -405,7 +369,7 @@ namespace Honeywell.Database
                 var graph = ReadGraphFromXML(dbGraph.Xml);
 
                 var nodesInModules = dbGraph.Nodes.Where(x => x.Module != null).ToList();
-                var modules = nodesInModules.Select(x => x.Module.Name).Distinct().ToList();
+                var modules = nodesInModules.Select(x => x.Module!.Name).Distinct().ToList();
                 var moduleIds = modules.ToList();
                 for (int i = 0; i < moduleIds.Count(); i++)
                     moduleIds[i] = GetSubgraphId(moduleIds[i]);
@@ -436,7 +400,7 @@ namespace Honeywell.Database
                         graph.RootSubgraph.AddSubgraph(newSubgraph);
                     }
 
-                    var nodesInThisModule = nodesInModules.Where(x => x.Module.Name == moduleName);
+                    var nodesInThisModule = nodesInModules.Where(x => x.Module?.Name == moduleName);
 
                     foreach (var node in newSubgraph.Nodes) //check if nodes in subgraph are correct
                     {

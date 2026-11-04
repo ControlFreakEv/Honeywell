@@ -65,7 +65,7 @@ namespace Honeywell.GUI.Mapper.Forms.Tools
             return "OPERATOR";
         }
 
-        public string ConvertTdcToExperion(TdcTag tag, string paramName, string paramValue)
+        public string? ConvertTdcToExperion(TdcTag tag, string paramName, string paramValue)
         {
             paramName = paramName.ToUpper();
             paramValue = paramValue.ToUpper();

@@ -11,9 +11,9 @@ namespace Honeywell.GUI.Mapper
     //todo: filter/sort when dgv is empty fucks up
     internal class DgvHelper<T>
     {
-        public static List<T> GetSortedDataSource(AdvancedDataGridView.SortEventArgs e, object datasource)
+        public static List<T> GetSortedDataSource(AdvancedDataGridView.SortEventArgs e, object? datasource)
         {
-            var currentDataSource = (List<T>)datasource;
+            var currentDataSource = (List<T>?)datasource ?? new List<T>();
 
             var sortString = e.SortString;
             if (string.IsNullOrWhiteSpace(sortString))
@@ -38,10 +38,10 @@ namespace Honeywell.GUI.Mapper
             }
             return currentDataSource;
         }
-        public static List<T> GetFilteredDataSource(AdvancedDataGridView.FilterEventArgs e, List<T>? originalDataSource, object datasource)
+        public static List<T> GetFilteredDataSource(AdvancedDataGridView.FilterEventArgs e, List<T>? originalDataSource, object? datasource)
         {
             if (originalDataSource == null)
-                originalDataSource = (List<T>)datasource;
+                originalDataSource = (List<T>?)datasource ?? new List<T>();
 
             List<T> newDatasource = new();
 
@@ -99,7 +99,7 @@ namespace Honeywell.GUI.Mapper
                             foreach (var item in currentDataSource)
                             {
                                 var value = prop.GetValue(item)?.ToString();
-                                if (value.Contains(criteria, StringComparison.OrdinalIgnoreCase))
+                                if (value != null && value.Contains(criteria, StringComparison.OrdinalIgnoreCase))
                                     newDatasource.Add(item);
                             }
                         }
@@ -109,7 +109,7 @@ namespace Honeywell.GUI.Mapper
                             foreach (var item in currentDataSource)
                             {
                                 var value = prop.GetValue(item)?.ToString();
-                                if (value.EndsWith(criteria, StringComparison.OrdinalIgnoreCase))
+                                if (value != null && value.EndsWith(criteria, StringComparison.OrdinalIgnoreCase))
                                     newDatasource.Add(item);
                             }
                         }
@@ -119,7 +119,7 @@ namespace Honeywell.GUI.Mapper
                             foreach (var item in currentDataSource)
                             {
                                 var value = prop.GetValue(item)?.ToString();
-                                if (value.StartsWith(criteria, StringComparison.OrdinalIgnoreCase))
+                                if (value != null && value.StartsWith(criteria, StringComparison.OrdinalIgnoreCase))
                                     newDatasource.Add(item);
                             }
                         }
@@ -129,7 +129,7 @@ namespace Honeywell.GUI.Mapper
                             foreach (var item in currentDataSource)
                             {
                                 var value = prop.GetValue(item)?.ToString();
-                                if (value.Equals(criteria, StringComparison.OrdinalIgnoreCase))
+                                if (value != null && value.Equals(criteria, StringComparison.OrdinalIgnoreCase))
                                     newDatasource.Add(item);
                             }
                         }
@@ -144,7 +144,7 @@ namespace Honeywell.GUI.Mapper
                             foreach (var item in currentDataSource)
                             {
                                 var value = prop.GetValue(item)?.ToString();
-                                if (!value.Contains(criteria, StringComparison.OrdinalIgnoreCase))
+                                if (value == null || !value.Contains(criteria, StringComparison.OrdinalIgnoreCase))
                                     newDatasource.Add(item);
                             }
                         }
@@ -154,7 +154,7 @@ namespace Honeywell.GUI.Mapper
                             foreach (var item in currentDataSource)
                             {
                                 var value = prop.GetValue(item)?.ToString();
-                                if (!value.EndsWith(criteria, StringComparison.OrdinalIgnoreCase))
+                                if (value == null || !value.EndsWith(criteria, StringComparison.OrdinalIgnoreCase))
                                     newDatasource.Add(item);
                             }
                         }
@@ -164,7 +164,7 @@ namespace Honeywell.GUI.Mapper
                             foreach (var item in currentDataSource)
                             {
                                 var value = prop.GetValue(item)?.ToString();
-                                if (!value.StartsWith(criteria, StringComparison.OrdinalIgnoreCase))
+                                if (value == null || !value.StartsWith(criteria, StringComparison.OrdinalIgnoreCase))
                                     newDatasource.Add(item);
                             }
                         }
@@ -174,7 +174,7 @@ namespace Honeywell.GUI.Mapper
                             foreach (var item in currentDataSource)
                             {
                                 var value = prop.GetValue(item)?.ToString();
-                                if (!value.Equals(criteria, StringComparison.OrdinalIgnoreCase))
+                                if (value == null || !value.Equals(criteria, StringComparison.OrdinalIgnoreCase))
                                     newDatasource.Add(item);
                             }
                         }

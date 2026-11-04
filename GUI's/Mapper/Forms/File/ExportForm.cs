@@ -77,7 +77,7 @@ namespace Honeywell.GUI.Mapper.Forms
                 foreach (DataGridViewRow dgvRow in ExportDataGridView.Rows)
                 {
                     var selected = dgvRow.Cells[0].Value as bool? ?? false;
-                    var table = dgvRow.Cells[1].Value.ToString();
+                    var table = dgvRow.Cells[1].Value?.ToString();
                     if (!selected)
                         continue;
 

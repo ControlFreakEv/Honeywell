@@ -102,9 +102,9 @@ namespace Honeywell.Parsers.TDC.Graphs
                 Node? sourceNode = null, targetNode = null;
 
                 if (targetParamName == "PVSLTSRC")
-                    sourceParamName += $".{targetTag.Params.FirstOrDefault(x => x.Name == "PVSIGNAL")?.Value}";
+                    sourceParamName += $".{targetTag?.Params.FirstOrDefault(x => x.Name == "PVSIGNAL")?.Value}";
                 else if (targetParamName == "SPSLTSRC")
-                    sourceParamName += $".{targetTag.Params.FirstOrDefault(x => x.Name == "SPSIGNAL")?.Value}";
+                    sourceParamName += $".{targetTag?.Params.FirstOrDefault(x => x.Name == "SPSIGNAL")?.Value}";
 
                 if (sourceNode == null)
                     sourceNode = NodeFactory.CreateOrGetNode(sourceTag, sourceParamName) ?? NodeFactory.CreateOrGetMissingNode(targetParameter);
@@ -118,7 +118,7 @@ namespace Honeywell.Parsers.TDC.Graphs
 
             #region Add edges to CDS
             foreach (var cds in Parser.TdcParameters.Where(x => x.CdsTag != null))
-                EdgeFactory.AddEdge(cds.CdsTag.Name, $"{cds.CdsTag.Name} -> {cds.Name}", cds.ParentTag.Name);
+                EdgeFactory.AddEdge(cds.CdsTag!.Name, $"{cds.CdsTag.Name} -> {cds.Name}", cds.ParentTag.Name);
             #endregion
         }
 
@@ -214,7 +214,9 @@ namespace Honeywell.Parsers.TDC.Graphs
                 while (!csvParser.EndOfData)
                 {
                     // Read current line fields, pointer moves to the next line.
-                    string[] fields = csvParser.ReadFields();
+                    string[]? fields = csvParser.ReadFields();
+                    if (fields == null)
+                        break;
                     Parser.TdcTags.TryGetValue(fields[0], out var srcTag);
                     string srcParameter = fields[2];
 
@@ -247,9 +249,9 @@ namespace Honeywell.Parsers.TDC.Graphs
             {
                 var targetNodes = node.OutEdges.Where(x => x.TargetNode.UserData is TdcTag).Select(x => x.TargetNode);
                 var targetTagIdList = targetNodes.Select(x => ((TdcTag)x.UserData).Id).Distinct(); //tags logic block writes to
-                var moduleIdList = Parser.TdcTags.Values.Where(x => x.Module != null && targetTagIdList.Contains(x.Id)).Select(x => x.Module.Id).Distinct(); //module of target tags
+                var moduleIdList = Parser.TdcTags.Values.Where(x => x.Module != null && targetTagIdList.Contains(x.Id)).Select(x => x.Module!.Id).Distinct(); //module of target tags
                 if (moduleIdList.Count() == 0) //possibly connected to logic tag that is in module
-                    moduleIdList = dbNodes.Where(x => targetNodes.Select(y => y.Id).Contains(x.NodeId)).Where(x => x.ModuleId != null).Select(x => (int)x.ModuleId).Distinct();
+                    moduleIdList = dbNodes.Where(x => targetNodes.Select(y => y.Id).Contains(x.NodeId)).Where(x => x.ModuleId != null).Select(x => (int)x.ModuleId!).Distinct();
 
                 if (moduleIdList.Count() == 1) //connected to a single tag that has module
                 {
@@ -410,8 +412,13 @@ namespace Honeywell.Parsers.TDC.Graphs
 
                         if (sourceAddress != targetAddress)
                         {
-                            var sourceNodeId = dbNodes.FirstOrDefault(x => x.NodeId == sourceNode.Id).Id;
-                            var targetNodeId = dbNodes.FirstOrDefault(x => x.NodeId == targetNode.Id).Id;
+                            var sourceDbNode = dbNodes.FirstOrDefault(x => x.NodeId == sourceNode.Id);
+                            var targetDbNode = dbNodes.FirstOrDefault(x => x.NodeId == targetNode.Id);
+                            if (sourceDbNode == null || targetDbNode == null)
+                                throw new Exception($"Could not locate node for edge {sourceNode.Id} -> {targetNode.Id} in graph {graphId}");
+
+                            var sourceNodeId = sourceDbNode.Id;
+                            var targetNodeId = targetDbNode.Id;
 
                             db.SourceTdcCrossComms.Add(new() { Id = ++crossCommId, NodeId = sourceNodeId }) ;
                             db.TargetTdcCrossComms.Add(new() { Id = crossCommId, NodeId = targetNodeId });

@@ -25,6 +25,9 @@ namespace Honeywell.GUI.Mapper
 
         public static List<TagsInCL> GetCLTags(DbTdcCL? cl, string? packageTag = null)
         {
+            if (cl == null)
+                return new List<TagsInCL>();
+
             var db = new TdcContext();
             var dbTdcCL = db.TdcCLs.FirstOrDefault(x => x.Id == cl.Id);
 

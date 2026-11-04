@@ -71,7 +71,12 @@ namespace Honeywell.GUI.ExperionGfx
                 }
 
                 //populate data
-                var dt = (DataTable)AssociatedDisplayDataGrid.DataSource;
+                var dt = (DataTable?)AssociatedDisplayDataGrid.DataSource;
+                if (dt == null)
+                {
+                    MessageBox.Show("Nothing to Export. Click 'Go' first.");
+                    return;
+                }
                 foreach (DataRow dr in dt.Rows)
                 {
                     row = ws.CreateRow(rowIndex++);
@@ -132,7 +137,12 @@ namespace Honeywell.GUI.ExperionGfx
                 }
 
                 StringBuilder sb = new StringBuilder();
-                var dt = (DataTable)AssociatedDisplayDataGrid.DataSource;
+                var dt = (DataTable?)AssociatedDisplayDataGrid.DataSource;
+                if (dt == null)
+                {
+                    MessageBox.Show("Nothing to Export. Click 'Go' first.");
+                    return;
+                }
                 IEnumerable<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
                 sb.AppendLine(string.Join(",", columnNames));
 
@@ -271,7 +281,7 @@ namespace Honeywell.GUI.ExperionGfx
                 var lines = WriteSafeReadAllLines(filePath).Skip(1);
                 Parallel.ForEach(lines, csv =>
                 {
-                    string[] line;
+                    string[]? line;
                     if (csv.Contains('"'))
                     {
                         using (TextFieldParser parser = new TextFieldParser(new StringReader(csv)))
@@ -285,6 +295,8 @@ namespace Honeywell.GUI.ExperionGfx
                     }
                     else
                         line = csv.Split(',');
+                    if (line == null)
+                        return;
                     int csvIndex = 0;
                     int.TryParse(line[dict.IndexOf(nameof(Shape.CsvIndex))], out csvIndex);
 
@@ -331,7 +343,9 @@ namespace Honeywell.GUI.ExperionGfx
                 List<string> file = new List<string>();
                 while (!sr.EndOfStream)
                 {
-                    file.Add(sr.ReadLine());
+                    var line = sr.ReadLine();
+                    if (line != null)
+                        file.Add(line);
                 }
 
                 return file.ToArray();
@@ -348,7 +362,7 @@ namespace Honeywell.GUI.ExperionGfx
         {
             var shapeList = new ConcurrentBag<Shape>();
 
-            var dt = ((DataTable)AssociatedDisplayDataGrid.DataSource);
+            var dt = ((DataTable?)AssociatedDisplayDataGrid.DataSource);
             if (dt != null)
             {
                 var dtEnumerable = dt.AsEnumerable();//.SkipWhile(x => x[ShapeSourceColumn.Index] == ShapeSourceColumn.HeaderText);
@@ -602,7 +616,7 @@ namespace Honeywell.GUI.ExperionGfx
 
                         #region Toolip
                         var tooltipNodes = htmlDoc.DocumentNode.SelectNodes(@"//*[@title]");
-                        foreach (var tooltipNode in tooltipNodes)
+                        foreach (var tooltipNode in tooltipNodes ?? Enumerable.Empty<HtmlAgilityPack.HtmlNode>())
                         {
                             var tooltipShape = new Shape
                             {
@@ -625,7 +639,7 @@ namespace Honeywell.GUI.ExperionGfx
                             else
                             {
                                 string xPath = $@"//*[contains(@hdxproperties,'HDXBINDINGID:{shape.BindingId};')]";
-                                var node = htmlDoc.DocumentNode.SelectNodes(xPath).FirstOrDefault();
+                                var node = htmlDoc.DocumentNode.SelectNodes(xPath)?.FirstOrDefault();
 
                                 if (node != null)
                                 {
@@ -640,6 +654,8 @@ namespace Honeywell.GUI.ExperionGfx
                                             shape.ShapePath = $"{node.Id} {pathSeparator} {shape.ShapePath}";
 
                                         node = node.ParentNode;
+                                        if (node == null)
+                                            break;
 
                                         var newerSrc = node.Attributes["src"];
                                         if (newerSrc != null)
@@ -656,14 +672,14 @@ namespace Honeywell.GUI.ExperionGfx
                                         var srcShape = Path.GetFileName(src.Value);
                                         shape.ShapeSource = srcShape;
 
-                                        if (shape.ShapePath.Contains(pathSeparator))
+                                        if (shape.ShapePath?.Contains(pathSeparator) == true)
                                         {
                                             shape.CustomParamType = shape.DataType;
                                             shape.DataType = Shape.ObjectType.CustomParameter;
 
                                             var shapeId = shape.ShapePath.Split(pathSeparator)[^1].Trim();
                                             var customShapes = customShapeList
-                                                .Where(x => x.ShapeName.ToUpper() == shape.ShapeSource.ToUpper())
+                                                .Where(x => x.ShapeName.ToUpper() == shape.ShapeSource?.ToUpper())
                                                 .Where(x => $"{shape.ShapeName}_{x.SubShapeName}" == shapeId)
                                                 .Where(x => x.CsvIndex == shape.CsvIndex)
                                                 .Where(x => x.DataType == shape.CustomParamType);
@@ -712,11 +728,13 @@ namespace Honeywell.GUI.ExperionGfx
 
                                     xPath = $@"//*[@id=""{node.Id}_{customShape.SubShapeName}""]";
 
-                                    var subNode = htmlDoc.DocumentNode.SelectNodes(xPath).FirstOrDefault();
+                                    var subNode = htmlDoc.DocumentNode.SelectNodes(xPath)?.FirstOrDefault();
+                                    if (subNode == null)
+                                        continue;
                                     if (customShape.PointName != null)
-                                        shape.Point = subNode?.InnerText.Trim();
+                                        shape.Point = subNode.InnerText.Trim();
                                     else if (customShape.ParameterName != null)
-                                        shape.Parameter = subNode?.InnerText.Trim();
+                                        shape.Parameter = subNode.InnerText.Trim();
 
 
                                     while (subNode.Id != "Page")
@@ -727,6 +745,8 @@ namespace Honeywell.GUI.ExperionGfx
                                             shape.ShapePath = $"{subNode.Id} {pathSeparator} {shape.ShapePath}";
 
                                         subNode = subNode.ParentNode;
+                                        if (subNode == null)
+                                            break;
                                     }
 
                                     addToConcurrentList.Add(shape);
@@ -743,7 +763,7 @@ namespace Honeywell.GUI.ExperionGfx
                             foreach (var node in customParamNodes)
                             {
                                 var src = node.Attributes["src"];
-                                var shapeSrc = Path.GetFileName(src.Value);
+                                var shapeSrc = Path.GetFileName(src?.Value);
                                 var parameters = node.Attributes["parameters"]?.Value;
                                 if (!string.IsNullOrWhiteSpace(parameters))
                                 {
@@ -891,13 +911,15 @@ namespace Honeywell.GUI.ExperionGfx
                     if (shape.NewTooltip != null)
                     {
                         var xPath = $@"//*[@id=""{shape.ShapeName}""]";
-                        var tooltipNode = htmlDoc.DocumentNode.SelectSingleNode(xPath);
+                        var tooltipNode = htmlDoc.DocumentNode.SelectSingleNode(xPath)
+                            ?? throw new InvalidOperationException($"Can't find shape '{shape.ShapeName}' in graphic '{gfxName}' to set its tooltip");
                         tooltipNode.SetAttributeValue("title", shape.NewTooltip);
                     }
 
                     if (shape.NewCss != null)
                     {
-                        var cssNode = htmlDoc.DocumentNode.SelectSingleNode(@"//*[@id=""HDXStylesheet""]");
+                        var cssNode = htmlDoc.DocumentNode.SelectSingleNode(@"//*[@id=""HDXStylesheet""]")
+                            ?? throw new InvalidOperationException($"Can't find the HDXStylesheet node in graphic '{gfxName}' to set its CSS");
                         cssNode.SetAttributeValue("href", shape.NewCss);
                     }
 
@@ -973,9 +995,12 @@ namespace Honeywell.GUI.ExperionGfx
                         {
                             if (shape.CustomParamType == Shape.ObjectType.CustomParameterEmbedded)
                             {
-                                var shapeId = shape.ShapePath.Split(pathSeparator)[^1].Trim();
+                                var shapePath = shape.ShapePath
+                                    ?? throw new InvalidOperationException($"Shape '{shape.ShapeName}' in graphic '{gfxName}' has no shape path for its embedded custom parameter");
+                                var shapeId = shapePath.Split(pathSeparator)[^1].Trim();
                                 var xPath = $@"//*[@id=""{shapeId}""]";
-                                var node = htmlDoc.DocumentNode.SelectNodes(xPath).FirstOrDefault();
+                                var node = htmlDoc.DocumentNode.SelectNodes(xPath)?.FirstOrDefault()
+                                    ?? throw new InvalidOperationException($"Can't find node '{shapeId}' in graphic '{gfxName}' for an embedded custom parameter of shape '{shape.ShapeName}'");
                                 if (node != null)
                                 {
                                     if (shape.Point != null && shape.NewPoint != null)
@@ -992,7 +1017,7 @@ namespace Honeywell.GUI.ExperionGfx
                             else
                             {
                                 string xPath = $@"//*[@id=""{shape.ShapeName}""]";
-                                var node = htmlDoc.DocumentNode.SelectNodes(xPath).FirstOrDefault();
+                                var node = htmlDoc.DocumentNode.SelectNodes(xPath)?.FirstOrDefault();
                                 if (node == null)
                                     throw new Exception($"Can't find Custom Parameters in Graphic {gfxName} for shape {shape.ShapeName}");
 
@@ -1052,14 +1077,14 @@ namespace Honeywell.GUI.ExperionGfx
             }
 
             var shapesDataGrid = GetShapesFromDataGrid();
-            var shapeReplacementsFromDataGrid = shapesDataGrid.Where(x => x.ReplaceShapeName != null).Where(x => x.ReplaceShapeName.ToUpper() != x.ShapeSource?.ToUpper());
+            var shapeReplacementsFromDataGrid = shapesDataGrid.Where(x => x.ReplaceShapeName != null).Where(x => x.ReplaceShapeName!.ToUpper() != x.ShapeSource?.ToUpper());
             if (!shapeReplacementsFromDataGrid.Any())
             {
                 MessageBox.Show("Nothing to replace.");
                 return;
             }
 
-            var distinctShapeReplacements = shapeReplacementsFromDataGrid.Select(x => x.ReplaceShapeName.ToUpper()).Distinct();
+            var distinctShapeReplacements = shapeReplacementsFromDataGrid.Select(x => x.ReplaceShapeName!.ToUpper()).Distinct();
             var shapeReplacementsDefined = shapeReplacements.Select(y => y.NewShapeName.ToUpper());
             var missingShapes = distinctShapeReplacements.Where(x => !shapeReplacementsDefined.Contains(x)); //x is replacement shape name (all caps). Search shape replacement gfx to verify shape exists
             if (missingShapes.Any())
@@ -1097,9 +1122,11 @@ namespace Honeywell.GUI.ExperionGfx
                         if (replacement != null)
                         {
                             string xPath = $@"//*[@id=""{shape.ShapeName}""]";
-                            var nodeToReplace = htmlDoc.DocumentNode.SelectNodes(xPath).FirstOrDefault();
+                            var nodeToReplace = htmlDoc.DocumentNode.SelectNodes(xPath)?.FirstOrDefault()
+                                ?? throw new InvalidOperationException($"Can't find shape '{shape.ShapeName}' in graphic '{gfxName}' to replace it with '{shape.ReplaceShapeName}'");
+                            var insertionPoint = nodeToReplace.ParentNode
+                                ?? throw new InvalidOperationException($"Shape '{shape.ShapeName}' in graphic '{gfxName}' has no parent node");
                             var newNode = replacement.ReplaceShape(nodeToReplace, gfxFilesPath, ResizeCheckBox.Checked);
-                            var insertionPoint = nodeToReplace.ParentNode;
                             nodeToReplace.Remove();
 
                             insertionPoint.AppendChild(newNode);
@@ -1121,7 +1148,7 @@ namespace Honeywell.GUI.ExperionGfx
             var dict = GetDataTableMapping();
             foreach (KeyValuePair<string, string> item in dict)
             {
-                PropertyDescriptor prop = properties[item.Key];
+                PropertyDescriptor? prop = properties[item.Key];
                 //var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
                 var value = item.Value.ToString();
                 table.Columns.Add(value);

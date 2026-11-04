@@ -17,10 +17,10 @@ namespace Honeywell.GUI.Mapper
 
         public CrossComms(DbTdcNode sourceNode, DbTdcNode targetNode)
         {
-            SourceTagName = sourceNode.Tag.Name;
-            TargetTagName = targetNode.Tag.Name;
-            SourceAddress = sourceNode.Tag.LcnAddress;
-            TargetAddress = targetNode.Tag.LcnAddress;
+            SourceTagName = sourceNode.Tag?.Name ?? string.Empty;
+            TargetTagName = targetNode.Tag?.Name ?? string.Empty;
+            SourceAddress = sourceNode.Tag?.LcnAddress ?? string.Empty;
+            TargetAddress = targetNode.Tag?.LcnAddress ?? string.Empty;
             GraphId = sourceNode.GraphId;
         }
 
@@ -31,7 +31,12 @@ namespace Honeywell.GUI.Mapper
             var targetNodes = db.TargetTdcCrossComms.OrderBy(x => x.Id).Select(x => x.Node).ToList();
             var result = new List<CrossComms>();
             for (int i = 0; i < sourceNodes.Count; i++)
-                result.Add(new CrossComms(sourceNodes[i], targetNodes[i]));
+            {
+                var sourceNode = sourceNodes[i];
+                var targetNode = targetNodes[i];
+                if (sourceNode != null && targetNode != null)
+                    result.Add(new CrossComms(sourceNode, targetNode));
+            }
 
             return result.OrderBy(x => x.SourceTagName).ToList();
         }

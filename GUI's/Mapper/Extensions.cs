@@ -24,7 +24,7 @@ namespace Honeywell.GUI.Mapper
             return source?.IndexOf(toCheck, comp) >= 0;
         }
 
-        public static bool Contains(this string[] source, string toCheck, StringComparison comp)
+        public static bool Contains(this string[] source, string? toCheck, StringComparison comp)
         {
             foreach (var item in source)
             {
@@ -47,7 +47,7 @@ namespace Honeywell.GUI.Mapper
             bool restartsearch = true;
             int startColumn = 0;
             int startRow = 0;
-            if (!e.FromBegin)
+            if (!e.FromBegin && dgv.CurrentCell != null)
             {
                 bool endcol = dgv.CurrentCell.ColumnIndex + 1 >= dgv.ColumnCount;
                 bool endrow = dgv.CurrentCell.RowIndex + 1 >= dgv.RowCount;

@@ -29,6 +29,8 @@ namespace Honeywell.HMIWeb
 
             string xPathSrc = $@"//*[@src]";
             var customShapeNode = htmlDoc.DocumentNode.SelectNodes(xPathSrc);
+            if (customShapeNode == null)
+                return replaceShapeList;
 
             Parallel.ForEach(customShapeNode, node =>
             {

@@ -173,7 +173,9 @@ namespace Honeywell.Parsers.TDC
                 while (!csvParser.EndOfData)
                 {
                     // Read current line fields, pointer moves to the next line.
-                    string[] fields = csvParser.ReadFields();
+                    string[]? fields = csvParser.ReadFields();
+                    if (fields == null)
+                        break;
                     string tag = fields[0];
                     string parameter = fields[1];
                     string value = fields[2];
@@ -197,9 +199,12 @@ namespace Honeywell.Parsers.TDC
 
             var sb = new StringBuilder();
             var pointTypeList = tagDt.AsEnumerable().Select(x => x.Field<string>("Type")).Distinct();
-            var amTags = tagDt.AsEnumerable().Where(x => x.Field<string>("Type")[^2..] == "AM").Select(x => new { Name = x.Field<string>("Name") , AM = x.Field<string>("Network").Replace("AM ", null) });
+            var amTags = tagDt.AsEnumerable().Where(x => x.Field<string>("Type")?[^2..] == "AM").Select(x => new { Name = x.Field<string>("Name") , AM = x.Field<string>("Network")?.Replace("AM ", null) });
             foreach (var pointType in pointTypeList)
             {
+                if (pointType == null)
+                    continue; //spare points, not table for point type
+
                 query = $"Select * From [{pointType}] order by [name]";
                 using var parameterDa = new OleDbDataAdapter(query, conection);
                 var parameterDt = new DataTable();
@@ -256,7 +261,7 @@ namespace Honeywell.Parsers.TDC
                         }
 
                         var logicName = logicDc?.ColumnName;
-                        if (i > 0 && logicDc != null) //skips name
+                        if (i > 0 && logicDc != null && logicDr != null) //skips name
                         {
                             var logicValue = logicDr[logicDc].ToString();
                             if (!string.IsNullOrWhiteSpace(logicValue))
@@ -264,7 +269,7 @@ namespace Honeywell.Parsers.TDC
                         }
                     }
 
-                    if (dictKey != null && cdsDict.TryGetValue(dictKey, out List<Tuple<string, string>> cdsList))
+                    if (dictKey != null && cdsDict.TryGetValue(dictKey, out List<Tuple<string, string>>? cdsList))
                     {
                         foreach (var cds in cdsList)
                             sb.AppendLine($"{cds.Item1} = \"{cds.Item2}\"");
@@ -284,7 +289,9 @@ namespace Honeywell.Parsers.TDC
                 while (!csvParser.EndOfData)
                 {
                     // Read current line fields, pointer moves to the next line.
-                    string[] fields = csvParser.ReadFields();
+                    string[]? fields = csvParser.ReadFields();
+                    if (fields == null)
+                        break;
                     string tag = fields[0];
                     string pointType = fields[1];
                     string hwy = fields[2];
@@ -369,20 +376,23 @@ namespace Honeywell.Parsers.TDC
                         else if (double.TryParse(paramValue, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
                             paramValue = number.ToString(CultureInfo.InvariantCulture); //removes trailing 0's
 
-                        if (paramName == "OENTNUMP")
-                            group.OENTNUMP = int.Parse(paramValue);
-                        else if (paramName == "TITLE")
-                            group.TITLE = paramValue;
-                        else if (paramName.Contains("EXTIDLST"))
-                            group.EXTIDLST[index - TdcGroup.OffsetEXTIDLST] = paramValue;
-                        else if (paramName.Contains("TRNDSET"))
-                            group.TRNDSET[index - TdcGroup.OffsetTRNDSET] = paramValue;
-                        else if (paramName == "TRNDBASE")
-                            group.TRNDBASE = paramValue;
-                        else if (paramName.Contains("SCREENUM"))
-                            group.SCREENUM[index - TdcGroup.OffsetSCREENUM] = paramValue;
-                        else if (paramName.Contains("DISPID"))
-                            group.DISPID[index - TdcGroup.OffsetDISPID] = paramValue;
+                        if (paramValue != null) //blank value leaves the group's default
+                        {
+                            if (paramName == "OENTNUMP")
+                                group.OENTNUMP = int.Parse(paramValue);
+                            else if (paramName == "TITLE")
+                                group.TITLE = paramValue;
+                            else if (paramName.Contains("EXTIDLST"))
+                                group.EXTIDLST[index - TdcGroup.OffsetEXTIDLST] = paramValue;
+                            else if (paramName.Contains("TRNDSET"))
+                                group.TRNDSET[index - TdcGroup.OffsetTRNDSET] = paramValue;
+                            else if (paramName == "TRNDBASE")
+                                group.TRNDBASE = paramValue;
+                            else if (paramName.Contains("SCREENUM"))
+                                group.SCREENUM[index - TdcGroup.OffsetSCREENUM] = paramValue;
+                            else if (paramName.Contains("DISPID"))
+                                group.DISPID[index - TdcGroup.OffsetDISPID] = paramValue;
+                        }
 
                         TdcGroups.Add(group);
                     }
@@ -491,7 +501,7 @@ namespace Honeywell.Parsers.TDC
                         #endregion
 
                         #region Update packages attached to tag
-                        if (paramName.Contains("PKGNAME"))
+                        if (paramName.Contains("PKGNAME") && paramValue != null) //blank package slot
                         {
                             if (!tdcTag.PackageExists)
                             {
@@ -501,7 +511,7 @@ namespace Honeywell.Parsers.TDC
 
                             tdcTag.Packages.Add(paramValue.ToUpper().Trim('"').Trim());
                         }
-                        else if (paramName.Contains("BLKNAME"))
+                        else if (paramName.Contains("BLKNAME") && paramValue != null) //blank block slot
                         {
                             if (!tdcTag.BlockExists)
                             {
@@ -527,7 +537,7 @@ namespace Honeywell.Parsers.TDC
             {
                 foreach (CLSlot clSlot in clSlotsList)
                 {
-                    if (TdcTags.TryGetValue(clSlot.Tag, out TdcTag tdcTag))
+                    if (TdcTags.TryGetValue(clSlot.Tag, out TdcTag? tdcTag))
                     {
                         var lastBlockIndex = 0;
                         if (tdcTag.BlockExists)
@@ -606,8 +616,13 @@ namespace Honeywell.Parsers.TDC
                         if (!match.Success)
                             continue;
 
-                        var hwy = int.Parse(match.Groups["HWY"].Success ? match.Groups["HWY"].Value : procModHg.HWYNUM).ToString();
-                        var box = int.Parse(match.Groups["Box"].Success ? match.Groups["Box"].Value : procModHg.BOXNUM).ToString();
+                        var hwyText = match.Groups["HWY"].Success ? match.Groups["HWY"].Value : procModHg.HWYNUM;
+                        var boxText = match.Groups["Box"].Success ? match.Groups["Box"].Value : procModHg.BOXNUM;
+                        if (hwyText == null || boxText == null) //no box address to resolve this reference against
+                            continue;
+
+                        var hwy = int.Parse(hwyText).ToString();
+                        var box = int.Parse(boxText).ToString();
                         (TdcTag? tag, string? tagParam) = ParseHgBoxAddress(match, hwy, box);
 
                         hwy = hwy.Length > 1 ? hwy : "0" + hwy;
@@ -674,7 +689,7 @@ namespace Honeywell.Parsers.TDC
             else
             {
                 var packageName = clFileName.Replace(".CL", null);
-                var blockAndPackageTags = TdcTags.Values.Where(x => (x.BlockExists && x.Blocks.Contains(clName)) || (x.PackageExists && x.Packages.Contains(packageName)));
+                var blockAndPackageTags = TdcTags.Values.Where(x => (x.BlockExists && clName != null && x.Blocks.Contains(clName)) || (x.PackageExists && x.Packages.Contains(packageName)));
                 foreach (var tag in blockAndPackageTags)
                 {
                     cl.TagsCLIsAttachedTo.Add(tag.Name);
@@ -754,7 +769,7 @@ namespace Honeywell.Parsers.TDC
                                     var index = lowIndex;
                                     while (index <= highIndex)
                                     {
-                                        if (TdcTags.TryGetValue(tagname, out TdcTag tag))
+                                        if (TdcTags.TryGetValue(tagname, out TdcTag? tag))
                                         {
                                             var parameterName = paramCaptures[i].Value.ToUpper();
                                             if (isArray)
@@ -763,7 +778,7 @@ namespace Honeywell.Parsers.TDC
                                             var cdsParam = tag.Params.FirstOrDefault(x => x.Name == parameterName);
                                             if (cdsParam != null && cdsParam.Value != null)
                                             {
-                                                if (TdcTags.TryGetValue(cdsParam.Value, out TdcTag cdsTag))
+                                                if (TdcTags.TryGetValue(cdsParam.Value, out TdcTag? cdsTag))
                                                 {
                                                     cdsParam.CdsTag = cdsTag;
                                                     AddCL(cl, cdsTag.Name);
@@ -783,7 +798,7 @@ namespace Honeywell.Parsers.TDC
             }
         }
 
-        private static (TdcTag?, string?) ParseHgBoxAddress(Match match, string? defaultHwy = null, string? defaultBox = null)
+        private static (TdcTag?, string?) ParseHgBoxAddress(Match match, string defaultHwy, string defaultBox)
         {
             var hwy = int.Parse(match.Groups["HWY"].Success ? match.Groups["HWY"].Value : defaultHwy).ToString();
             var box = int.Parse(match.Groups["Box"].Success ? match.Groups["Box"].Value : defaultBox).ToString();
@@ -808,7 +823,7 @@ namespace Honeywell.Parsers.TDC
                 tag = TdcTags.Values.FirstOrDefault(x => x.PointType == "REGHG" && x.HWYNUM == hwy && x.BOXNUM == box && x.SLOTNUM == index.ToString());
             else if (param == "LB") //logicblock (.js file)
             {
-                tag = TdcTags.Values.FirstOrDefault(x => x.PointType == "LOGICHG" && x.HWYNUM == hwy && x.BOXNUM == box && x.Params.First(x => x.Name == "Gate").Value == index.ToString() && !(x.Logic as LogicHgGate).SpecialGate);
+                tag = TdcTags.Values.FirstOrDefault(x => x.PointType == "LOGICHG" && x.HWYNUM == hwy && x.BOXNUM == box && x.Params.FirstOrDefault(x => x.Name == "Gate")?.Value == index.ToString() && x.Logic is LogicHgGate { SpecialGate: false });
                 tagParam = "OUT";
             }
             else if (param == "AI") //analog input
@@ -885,7 +900,7 @@ namespace Honeywell.Parsers.TDC
             foreach (var parentTag in digHgTags)
             {
                 #region Digital inputs
-                if (int.TryParse(parentTag.Params.FirstOrDefault(x => x.Name == "NMBRINPT")?.Value, out int diCount))
+                if (parentTag.INPTSSLT != null && int.TryParse(parentTag.Params.FirstOrDefault(x => x.Name == "NMBRINPT")?.Value, out int diCount))
                 {
                     for (int i = 0; i < diCount; i++)
                     {
@@ -901,7 +916,7 @@ namespace Honeywell.Parsers.TDC
                 #endregion
 
                 #region Digital outputs
-                if (int.TryParse(parentTag.Params.FirstOrDefault(x => x.Name == "NMBROUT")?.Value, out int doCount))
+                if (parentTag.OUTSSLT != null && int.TryParse(parentTag.Params.FirstOrDefault(x => x.Name == "NMBROUT")?.Value, out int doCount))
                 {
                     for (int i = 0; i < doCount; i++)
                     {

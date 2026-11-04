@@ -17,7 +17,7 @@ namespace Honeywell.HMIWeb
             set
             {
                 id = value;
-                BindingElement.Attribute("ID").Value = id.ToString();
+                BindingElement.SetAttributeValue("ID", id.ToString());
             }
         }
         public List<ShapeDataObject> DataObjects { get; set; } = new List<ShapeDataObject>();
@@ -26,14 +26,14 @@ namespace Honeywell.HMIWeb
         public ShapeBinding(XElement binding, List<ShapeDataObject> dataObjects)
         {
             BindingElement = binding;
-            id = int.Parse(binding.Attribute("ID").Value);
+            id = int.Parse(binding.Attribute("ID")?.Value ?? throw new InvalidOperationException("Binding has no 'ID' attribute: " + binding));
             DataObjects = dataObjects;
         }
 
         public static string? GetIdFromHtml(HtmlNode node)
         {
             var hdxProp = node.Attributes.Where(x => x.Name == "hdxproperties").FirstOrDefault();
-            if (hdxProp != null)
+            if (hdxProp?.Value != null)
             {
                 var match = regexbinding.Match(hdxProp.Value).Groups["Id"];
                 return match.Value;

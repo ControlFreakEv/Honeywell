@@ -42,7 +42,7 @@ namespace Honeywell.GUI.Mapper
         public GraphForm()
         {
             InitializeComponent();
-            var toolbar = (ToolStrip)gViewer.Controls["toolbar"];
+            var toolbar = (ToolStrip)gViewer.Controls["toolbar"]!;
 
             //GraphViewer.AsyncLayout = true;
             gViewer.MouseWheel += GraphViewer_MouseWheel;
@@ -63,15 +63,15 @@ namespace Honeywell.GUI.Mapper
             selectedObjectToolTip.ReshowDelay = 500;
 
             #region toolbar
-            saveButton = (ToolStripButton)toolbar.Items["saveButton"];
+            saveButton = (ToolStripButton)toolbar.Items["saveButton"]!;
             saveButton.ToolTipText = "Ctrl+S";
             saveButton.Click += SaveButton_Click;
 
-            ((ToolStripButton)toolbar.Items["zoomin"]).ToolTipText = "Scroll Wheel Up";
+            ((ToolStripButton)toolbar.Items["zoomin"]!).ToolTipText = "Scroll Wheel Up";
 
-            ((ToolStripButton)toolbar.Items["zoomout"]).ToolTipText = "Scroll Wheel Down";
+            ((ToolStripButton)toolbar.Items["zoomout"]!).ToolTipText = "Scroll Wheel Down";
 
-            ((ToolStripButton)toolbar.Items["panButton"]).ToolTipText = "Scroll Wheel Click";
+            ((ToolStripButton)toolbar.Items["panButton"]!).ToolTipText = "Scroll Wheel Click";
 
             toolbar.Items.RemoveByKey("openButton");
 
@@ -211,10 +211,15 @@ namespace Honeywell.GUI.Mapper
                 saveButton.Text = "";
             }
 
-            if (gViewer.Graph != null & Program.MainForm.SaveNodesEnabled)
+            if (gViewer.Graph != null && Program.MainForm.SaveNodesEnabled)
             {
+                if (!int.TryParse(gViewer.Graph.UserData?.ToString(), out var id))
+                {
+                    MessageBox.Show("This graph's layout can't be saved because it isn't linked to a saved graph.", "Save layout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 var xml = Database.Helper.WriteGraphToXML(gViewer.Graph);
-                var id = int.Parse(gViewer.Graph.UserData.ToString());
 
                 var dbGraph = db.TdcGraphs.First(x => x.Id == id);
                 dbGraph.Xml = xml;
@@ -278,10 +283,10 @@ namespace Honeywell.GUI.Mapper
 
         private void RedrawLinesBtn_Click(object? sender, EventArgs e)
         {
-            var edgeList = gViewer.Graph?.Edges.ToList();
-
-            if (edgeList == null)
+            if (gViewer.Graph == null)
                 return;
+
+            var edgeList = gViewer.Graph.Edges.ToList();
 
             for (int i = edgeList.Count - 1; i >= 0; i--)
                 gViewer.Graph.RemoveEdge(edgeList[i]);
@@ -428,7 +433,7 @@ namespace Honeywell.GUI.Mapper
                     edge.Attr.Color = Microsoft.Msagl.Drawing.Color.White;
                 else if (selectedObject is Node node)
                 {
-                    var decoratedObject = draggedObjectOriginalColors.Keys.Select(x => x as DNode).Where(x => x.Node.Id == node.Id).FirstOrDefault();
+                    var decoratedObject = draggedObjectOriginalColors.Keys.OfType<DNode>().Where(x => x.Node.Id == node.Id).FirstOrDefault();
                     if (decoratedObject == null || draggedObjectOriginalColors.Count() == 1)
                     {
                         node.Attr.Color = Microsoft.Msagl.Drawing.Color.Black;
@@ -447,7 +452,7 @@ namespace Honeywell.GUI.Mapper
                 gViewer.SetToolTip(selectedObjectToolTip, "");
             else
             {
-                selectedObject = gViewer?.ObjectUnderMouseCursor?.DrawingObject;
+                selectedObject = gViewer.ObjectUnderMouseCursor?.DrawingObject;
                 if (selectedObject is Edge selectedEdge)
                 {
                     //selectedObjectAttr = selectedEdge.Attr.Clone();

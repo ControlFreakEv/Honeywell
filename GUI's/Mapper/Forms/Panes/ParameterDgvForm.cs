@@ -34,13 +34,13 @@ namespace Honeywell.GUI.Mapper
             UpdateDataSource(this, DgvHelper<DbTdcParameter>.GetFilteredDataSource(e, originalDataSource, ParameterAdvancedDataGridView.DataSource), false);
         }
 
-        public static void UpdateDataSource(ParameterDgvForm form, List<DbTdcParameter> datasource, bool updateOriginalDataSource, bool reapplySortAndFilter = false)
+        public static void UpdateDataSource(ParameterDgvForm form, List<DbTdcParameter> datasource, bool updateOriginalDataSource, bool reapplySortAndFilter = false, int? selectedTagId = null)
         {
             if (updateOriginalDataSource)
                 form.originalDataSource = datasource.ToList();
             
             using var db = new TdcContext();
-            var tagId = datasource.FirstOrDefault()?.TagId;
+            var tagId = selectedTagId ?? datasource.FirstOrDefault()?.TagId; //a tag with no parameters still has file refs, CLs and connections
 
             var tag = db.TdcTags.FirstOrDefault(x => x.Id == tagId);
             if (tag != null && datasource.FirstOrDefault(x => x.Name == nameof(tag.PointType)) == null)
@@ -54,8 +54,10 @@ namespace Honeywell.GUI.Mapper
 
             form.ParameterAdvancedDataGridView.DataSource = datasource;
             form.Text = $"{formText} ({datasource.Count})";
-            var tagname = tag.Name;
-            form.nameDataGridViewTextBoxColumn.HeaderText = $"Name ({tagname})";
+            if (tag != null)
+                form.nameDataGridViewTextBoxColumn.HeaderText = $"Name ({tag.Name})";
+            else if (updateOriginalDataSource) //tag with no parameters, an empty filter result keeps the current tag
+                form.nameDataGridViewTextBoxColumn.HeaderText = "Name";
 
             if (reapplySortAndFilter)
             {
@@ -70,10 +72,16 @@ namespace Honeywell.GUI.Mapper
 
                 var clrefs = db.TdcCLRefs.Where(x => x.TagId == tagId);
                 var cl = clrefs.Select(x => x.CL).OrderBy(x => x.FileName).ToList() ?? new List<DbTdcCL>();
-                CLOnTagDgvForm.UpdateDataSource(Program.MainForm.MainClOnTagForm, tag?.Name, cl, true);
+                CLOnTagDgvForm.UpdateDataSource(Program.MainForm.MainClOnTagForm, tag.Name, cl, true);
 
                 var tagConnections = TagConnections.GetConnections(tag.Nodes.ToList());
                 Program.MainForm.MainTagConnectionsDgvForm.UpdateDataSource(tagConnections, true);
+            }
+            else if (updateOriginalDataSource)
+            {
+                Program.MainForm.MainFileRefsDgvForm.UpdateDataSource(new List<DbTdcFileRef>(), true);
+                CLOnTagDgvForm.UpdateDataSource(Program.MainForm.MainClOnTagForm, null, new List<DbTdcCL>(), true);
+                Program.MainForm.MainTagConnectionsDgvForm.UpdateDataSource(new List<TagConnections>(), true);
             }
             #endregion
         }

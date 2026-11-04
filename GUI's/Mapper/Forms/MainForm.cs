@@ -137,7 +137,7 @@ namespace Honeywell.GUI.Mapper
             using var db = new TdcContext();
             tag = db.TdcTags.First(x => x.Id == tag.Id);
             var parameters = tag?.Params.OrderBy(x => x.SortName).ToList() ?? new List<DbTdcParameter>();
-            ParameterDgvForm.UpdateDataSource(MainParameterForm, parameters, true, true);
+            ParameterDgvForm.UpdateDataSource(MainParameterForm, parameters, true, true, tag?.Id);
         }
 
         private void ModuleAdvancedDataGridView_CellClick(object? sender, DataGridViewCellEventArgs e)
@@ -214,14 +214,14 @@ namespace Honeywell.GUI.Mapper
             var currentNodeIdList = mainGraphForm.gViewer.Graph?.Nodes.Select(x => x.Id);
             if (currentNodeIdList != null && currentNodeIdList.Any() && int.TryParse(mainGraphForm.MaxNodes.Text, out int maxNodes))
             {
-                Graph newGraph;
+                Graph? newGraph;
                 if (primaryModuleName != null)
                     newGraph = GetGraphFromModuleName();
                 else
                     newGraph = GetGraphFromTagName();
 
                 var newNodeIdList = newGraph?.Nodes.Select(x => x.Id);
-                if (newNodeIdList.Count() != currentNodeIdList.Count() || newNodeIdList.Any(x => !currentNodeIdList.Contains(x)))
+                if (newNodeIdList != null && (newNodeIdList.Count() != currentNodeIdList.Count() || newNodeIdList.Any(x => !currentNodeIdList.Contains(x))))
                     mainGraphForm.gViewer.Graph = newGraph;
 
             }
@@ -267,7 +267,7 @@ namespace Honeywell.GUI.Mapper
             if (cl == null)
                 return;
 
-            var doc = dockPanel.Documents.FirstOrDefault(x => (x as DockContent).Text == cl.FileName) as DockContent;
+            var doc = dockPanel.Documents.FirstOrDefault(x => (x as DockContent)?.Text == cl.FileName) as DockContent;
             
             if (doc != null)
                 doc.Activate();
@@ -290,13 +290,13 @@ namespace Honeywell.GUI.Mapper
             if (cl == null)
                 return;
 
-            var doc = dockPanel.Documents.FirstOrDefault(x => (x as DockContent).Text == cl.CL.FileName) as DockContent;
+            var doc = dockPanel.Documents.FirstOrDefault(x => (x as DockContent)?.Text == cl.CL.FileName) as DockContent;
 
             if (doc != null)
                 doc.Activate();
             else
             {
-                string packageAttachment = null;
+                string? packageAttachment = null;
                 if (cl.FileName.Contains("Package"))
                     packageAttachment = cl.TagName;
 
@@ -332,13 +332,16 @@ namespace Honeywell.GUI.Mapper
             else
                 graph = Helper.GetGraph(primaryTagName);
 
+            if (graph == null)
+                return null;
+
             var nodeIdOnGraph = graph.Nodes.Select(x => x.Id);
 
             using var db = new TdcContext();
             primaryTagName = db.TdcTags.First(x => x.Id == primaryTagName.Id);
 
             var dbnodes = primaryTagName.Nodes.FirstOrDefault()?.Graph?.Nodes?.OrderBy(x => x.NodeId);
-            var nodesOnGraph = dbnodes.Where(x => nodeIdOnGraph.Contains(x.NodeId)).ToList();
+            var nodesOnGraph = dbnodes?.Where(x => nodeIdOnGraph.Contains(x.NodeId)).ToList() ?? new List<DbTdcNode>();
             var nodes = TagsOnMap.GetZoomNodes(nodesOnGraph);
             
             if (nodes != null)
@@ -376,7 +379,7 @@ namespace Honeywell.GUI.Mapper
             else
                 graph = Helper.GetGraph(primaryModuleName);
 
-            var nodes = TagsOnMap.GetZoomNodes(primaryModuleName.Nodes.FirstOrDefault()?.Graph?.Nodes?.OrderBy(x => x.NodeId).ToList());
+            var nodes = TagsOnMap.GetZoomNodes(primaryModuleName.Nodes.FirstOrDefault()?.Graph?.Nodes?.OrderBy(x => x.NodeId).ToList() ?? new List<DbTdcNode>());
             if (nodes != null)
                 mainTagsOnMapForm.UpdateDataSource(nodes, true);
 
@@ -385,16 +388,16 @@ namespace Honeywell.GUI.Mapper
 
         private void dockPanel_ActiveDocumentChanged(object sender, EventArgs e)
         {
-            var panelName = (dockPanel.ActiveDocument as DockContent).Text;
+            var panelName = (dockPanel.ActiveDocument as DockContent)?.Text;
 
             if (panelName != null && panelName.Contains(".CL"))
             {
              
-                var clViewerForm = dockPanel.ActiveContent as CLViewerForm;
+                var clViewerForm = dockPanel.ActiveContent as CLViewerForm ?? dockPanel.ActiveDocument as CLViewerForm;
                 if (clViewerForm != null)
                     CLViewerForm.MyFindReplace.Scintilla = clViewerForm.ScintillaTextEditorCL;
 
-                var tags = TagsInCL.GetCLTags(panelName, clViewerForm.PackageAttachment);
+                var tags = TagsInCL.GetCLTags(panelName, clViewerForm?.PackageAttachment);
                 MainTagsOnClForm.UpdateDataSource(tags, true);
             }
             else

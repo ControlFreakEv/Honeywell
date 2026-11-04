@@ -755,8 +755,8 @@ namespace Honeywell.Parsers.TDC.Logic
                 else if (input.Contains('.')) //tdc tag
                 {
                     var source = input.Split('.');
-                    sourceId = source?[0];
-                    sourceParamName = source?[1];
+                    sourceId = source[0];
+                    sourceParamName = source[1];
                     Parser.TdcTags.TryGetValue(sourceId, out TdcTag? sourceTag);
                     if (sourceTag != null && sourceParamName != null)
                         sourceId = NodeFactory.CreateOrGetNode(sourceTag, sourceParamName)?.Id;
@@ -843,11 +843,15 @@ namespace Honeywell.Parsers.TDC.Logic
                     {
                         var gate = GetGate(targetTagAndParam);
                         var targetNode = NodeFactory.CreateOrGetLogicNode(Tag, GetIdSO(gate));
+                        if (targetNode == null)
+                            throw new Exception($"Could not locate node for {sourceTag.Name}.{sourceParamName}");
                         EdgeFactory.AddEdge(sourceNode.Id, $"{sourceParamName} -> {targetParamName}", targetNode.Id);
                     }
                     else //writes to any other parameter of logic block e.g. ptexecst
                     {
                         var targetNode = Tag.Nodes.Where(x => x.Id == Name).FirstOrDefault();
+                        if (targetNode == null)
+                            throw new Exception($"Could not locate node for {sourceTag.Name}.{sourceParamName}");
                         EdgeFactory.AddEdge(sourceNode.Id, $"{sourceParamName} -> {targetParamName}", targetNode.Id);
                     }
                 } 
@@ -905,7 +909,7 @@ namespace Honeywell.Parsers.TDC.Logic
                     else
                         sourceNode = NodeFactory.CreateOrGetNode(Tag, sourceParamName);
 
-                    if (sourceNode == null)
+                    if (sourceNode == null || targetNode == null)
                         throw new Exception($"Unknown parameter reference on {targetTag}.{targetParamName} = {sourceTagAndParam}");
 
                     EdgeFactory.AddEdge(sourceNode.Id, $"{sourceParamName} -> {targetParamName}", targetNode.Id);

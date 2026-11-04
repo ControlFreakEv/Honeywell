@@ -66,7 +66,7 @@ namespace Honeywell.GUI.Mapper
                 dict[headerRow.Cells[k].StringCellValue] = k;
 
             var keyProp = typeof(TEntity).GetProperties().First(prop => Attribute.IsDefined(prop, typeof(KeyAttribute)));
-            var properties = typeof(TEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(ImportAndExport)) && ((ImportAndExport)prop.GetCustomAttribute(typeof(ImportAndExport))).Import);
+            var properties = typeof(TEntity).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(ImportAndExport)) && prop.GetCustomAttribute<ImportAndExport>()?.Import == true);
 
             int? newId = null;
             for (int k = 1; k <= ws.LastRowNum; k++)
@@ -107,7 +107,7 @@ namespace Honeywell.GUI.Mapper
                 var entity = entityList.Find(id);
                 if (entity == null)
                 {
-                    entity = (TEntity)Activator.CreateInstance(typeof(TEntity));
+                    entity = Activator.CreateInstance<TEntity>();
                     keyProp.SetValue(entity, id);
                     entityList.Add(entity);
                 }

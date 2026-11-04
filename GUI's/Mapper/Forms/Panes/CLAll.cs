@@ -20,7 +20,7 @@ namespace Honeywell.GUI.Mapper
             CL = dbCL;
             if (dbCL.CLTagReferences.Where(x => x.CLAttachedToThisPoint).Count() > 1)
             {
-                if (dbTdcTag.Params.Any(x => x.Name.Contains("PKGNAME") && x.Value == dbCL.FileName.Replace(".CL", null)))
+                if (dbTdcTag != null && dbTdcTag.Params.Any(x => x.Name.Contains("PKGNAME") && x.Value == dbCL.FileName.Replace(".CL", null)))
                     FileName = $"{dbCL.FileName} (Package)";
                 else
                     FileName = $"{dbCL.FileName} (Block)";

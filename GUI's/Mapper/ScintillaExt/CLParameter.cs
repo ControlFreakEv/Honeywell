@@ -3,7 +3,7 @@
     public class CLParameter
     {
         public string Name { get; set; } = null!;
-        public string Type { get; set; } = null!;
-        public string ParamList { get; set; } = null!;
+        public string? Type { get; set; }
+        public string? ParamList { get; set; }
     }
 }

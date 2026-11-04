@@ -43,7 +43,7 @@ namespace Honeywell.HMIWeb
                 var match = matches[i];
                 var type = match.Groups["Type"].Value;
                 var name = match.Groups["CustomProperty"].Value;
-                string value = null;
+                string value;
                 if (i == matches.Count - 1)
                 {
                     value = htmParameters[(match.Index + match.Length)..(htmParameters.Length-1)];

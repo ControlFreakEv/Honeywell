@@ -32,7 +32,10 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
                 while (!parser.EndOfData)
                 {
                     //Processing row
-                    string[] fields = parser.ReadFields();
+                    string[]? fields = parser.ReadFields();
+                    if (fields == null)
+                        continue;
+
                     Functions.Add(new CLFunctions() { Name = fields[0], Description = fields[1], Arguments = bool.Parse(fields[2]) });
                 }
             }

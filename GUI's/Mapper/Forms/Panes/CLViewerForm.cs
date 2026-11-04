@@ -79,13 +79,12 @@ namespace Honeywell.GUI.Mapper
             splitContainer1.Panel2.Controls.Add(ScintillaTextEditorCL);
 
             using var db = new TdcContext();
-            dbTdcCL = db.TdcCLs.FirstOrDefault(x => x.Id == cl.Id);
+            var clFromDb = db.TdcCLs.FirstOrDefault(x => x.Id == cl.Id);
 
-            if (dbTdcCL == null && cl.FileName == SampleCl.SampleClFileName)
-            {
-                dbTdcCL = cl;
+            if (clFromDb == null && cl.FileName == SampleCl.SampleClFileName)
                 packageAttachment = cl.CLTagReferences.FirstOrDefault(x => x.CLAttachedToThisPoint)?.Tag?.Name;
-            }
+
+            dbTdcCL = clFromDb ?? cl;
 
             if (Lexer.PrettyPrint(dbTdcCL.Content) == dbTdcCL.OriginalContent && dbTdcCL.Indicators == null)
                 OriginalCLToolStripButton.Enabled = false;
@@ -162,7 +161,7 @@ namespace Honeywell.GUI.Mapper
 
         private void ScintillaTextEditorCL_StyleNeeded(object sender, StyleNeededEventArgs e)
         {
-            var scintilla = sender as ScintillaTextEditor;
+            var scintilla = (ScintillaTextEditor)sender;
             var startPos = scintilla.GetEndStyled();
             var endPos = e.Position;
             //var debug = scintilla.GetTextRange(startPos, endPos);
@@ -374,23 +373,23 @@ namespace Honeywell.GUI.Mapper
 
             ScintillaTextEditorCL.Indicators[0].ForeColor = OrangeToolStripTextBox.BackColor;
             ScintillaTextEditorCL.Indicators[0].Style = IndicatorStyle.RoundBox;
-            IndicatorDict[OrangeToolStripTextBox.Text] = 0;
+            IndicatorDict[OrangeToolStripTextBox.Text!] = 0;
 
             ScintillaTextEditorCL.Indicators[1].ForeColor = YellowToolStripTextBox.BackColor;
             ScintillaTextEditorCL.Indicators[1].Style = IndicatorStyle.RoundBox;
-            IndicatorDict[YellowToolStripTextBox.Text] = 1;
+            IndicatorDict[YellowToolStripTextBox.Text!] = 1;
 
             ScintillaTextEditorCL.Indicators[2].ForeColor = BlueToolStripTextBox.BackColor;
             ScintillaTextEditorCL.Indicators[2].Style = IndicatorStyle.RoundBox;
-            IndicatorDict[BlueToolStripTextBox.Text] = 2;
+            IndicatorDict[BlueToolStripTextBox.Text!] = 2;
 
             ScintillaTextEditorCL.Indicators[3].ForeColor = GreenToolStripTextBox.BackColor;
             ScintillaTextEditorCL.Indicators[3].Style = IndicatorStyle.RoundBox;
-            IndicatorDict[GreenToolStripTextBox.Text] = 3;
+            IndicatorDict[GreenToolStripTextBox.Text!] = 3;
 
             ScintillaTextEditorCL.Indicators[4].ForeColor = RedToolStripTextBox.BackColor;
             ScintillaTextEditorCL.Indicators[4].Style = IndicatorStyle.RoundBox;
-            IndicatorDict[RedToolStripTextBox.Text] = 4;
+            IndicatorDict[RedToolStripTextBox.Text!] = 4;
         }
 
         private void ScintillaNet_DwellEnd(object? sender, DwellEventArgs e)
@@ -447,7 +446,7 @@ namespace Honeywell.GUI.Mapper
             //}
         }
 
-        private void UpdateEbParameters(Scintilla scintilla)
+        private void UpdateEbParameters(Scintilla? scintilla)
         {
             if (scintilla == null)
                 return;
@@ -518,12 +517,12 @@ namespace Honeywell.GUI.Mapper
 
                 if (tag == null)
                     return;
-                ParameterDgvForm.UpdateDataSource(Program.MainForm.MainParameterForm, tag.Params.OrderBy(x => x.SortName).ToList(), true, true);
+                ParameterDgvForm.UpdateDataSource(Program.MainForm.MainParameterForm, tag.Params.OrderBy(x => x.SortName).ToList(), true, true, tag.Id);
                 CLOnTagDgvForm.UpdateDataSource(Program.MainForm.MainClOnTagForm, tag.Name, tag.CLTagReferences.Select(x => x.CL).OrderBy(x => x.FileName).ToList(), true);
             }
         }
 
-        private void UpdateTooltip(Scintilla scintilla)
+        private void UpdateTooltip(Scintilla? scintilla)
         {
             if (scintilla == null)
                 return;
@@ -533,7 +532,7 @@ namespace Honeywell.GUI.Mapper
             var pos = scintilla.CharPositionFromPoint(cor.X, cor.Y);
             var style = scintilla.GetStyleAt(pos);
 
-            string tooltip = null;
+            string? tooltip = null;
             if (style == CLLexer.Function)
             {
                 var word = scintilla.GetWordFromPosition(pos);
@@ -585,9 +584,9 @@ namespace Honeywell.GUI.Mapper
                 scintilla.CallTipShow(pos, tooltip);
         }
 
-        private string GetParamToolip(string word, int recursion = 0)
+        private string? GetParamToolip(string word, int recursion = 0)
         {
-            string tooltip = null;
+            string? tooltip = null;
             var parameter = Lexer.ClParameterList.FirstOrDefault(x => x != null && x.Name.Equals(word, StringComparison.OrdinalIgnoreCase));
 
             if (parameter != null)
@@ -621,9 +620,9 @@ namespace Honeywell.GUI.Mapper
             return AddIndentToTooltip(tooltip, recursion);
         }
 
-        private string GetParamListToolip(string paramList, int recursion = 0)
+        private string? GetParamListToolip(string paramList, int recursion = 0)
         {
-            string tooltip = null;
+            string? tooltip = null;
             var clParameters = Lexer.ClParameterList.Where(x => x.ParamList != null && x.ParamList.Equals(paramList, StringComparison.OrdinalIgnoreCase));
             if (clParameters.Any())
             {
@@ -637,7 +636,7 @@ namespace Honeywell.GUI.Mapper
             return AddIndentToTooltip(tooltip, recursion);
         }
 
-        private string AddIndentToTooltip(string tooltip, int recursion)
+        private string? AddIndentToTooltip(string? tooltip, int recursion)
         {
             if (recursion > 0 && tooltip != null)
             {
@@ -645,7 +644,7 @@ namespace Honeywell.GUI.Mapper
                 var indent = new string('\t', recursion);
                 using (StringReader reader = new StringReader(tooltip))
                 {
-                    string line;
+                    string? line;
                     while ((line = reader.ReadLine()) != null)
                     {
                         stringbuilder.AppendLine(indent + line);
@@ -681,7 +680,7 @@ namespace Honeywell.GUI.Mapper
             if (cl != null)
             {
                 #region Indicators
-                string dbIndicator = null;
+                string? dbIndicator = null;
                 var textLength = ScintillaTextEditorCL.TextLength;
                 for (int i = 0; i < IndicatorDict.Count; i++)
                 {
@@ -812,7 +811,7 @@ namespace Honeywell.GUI.Mapper
             }
 
             var key = HighlightToolStripDropDownButton.Text;
-            if (key != "None")
+            if (key != null && key != "None")
             {
                 ScintillaTextEditorCL.IndicatorCurrent = IndicatorDict[key];
                 ScintillaTextEditorCL.IndicatorFillRange(ScintillaTextEditorCL.SelectionStart, ScintillaTextEditorCL.SelectedText.Length);
@@ -873,12 +872,21 @@ namespace Honeywell.GUI.Mapper
             if (cl == null && dbTdcCL.FileName == SampleCl.SampleClFileName)
                 cl = dbTdcCL;
 
-            var attachedTag = cl.CLTagReferences.FirstOrDefault(x => x.Tag.Name == attachedPoint)?.Tag;
+            var attachedTag = cl?.CLTagReferences.FirstOrDefault(x => x.Tag.Name == attachedPoint)?.Tag;
+            if (attachedTag == null)
+            {
+                OpenFile(dbTdcCL.Content);
+                return;
+            }
+
             var content = dbTdcCL.OriginalContent;
 
             var newExternalTags = new List<string>();
             foreach (var cds in attachedTag.Params.Where(x => x.CDS))
             {
+                if (cds.Value == null)
+                    continue;
+
                 Regex regexCds = new(@"(?<!(--.*))(\b" + cds.Name + @"\b)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
                 content = regexCds.Replace(content, cds.Value);
 

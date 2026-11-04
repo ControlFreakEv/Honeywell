@@ -15,14 +15,14 @@ namespace Honeywell.HMIWeb
             set
             {
                 id = value;
-                DataObject.Attribute("id").Value = id.ToString();
+                DataObject.SetAttributeValue("id", id.ToString());
             }
         }
 
         public ShapeDataObject(XElement dataObject)
         {
             DataObject = dataObject;
-            id = int.Parse(dataObject.Attribute("id").Value);
+            id = int.Parse(dataObject.Attribute("id")?.Value ?? throw new InvalidOperationException("Data object has no 'id' attribute: " + dataObject));
         }
 
         public ShapeDataObject CopyDataObject()

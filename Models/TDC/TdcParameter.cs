@@ -80,7 +80,7 @@ namespace Honeywell.TDC
                 var arr = Value.Split('.');
                 connectedParameter = arr.Last();
                 var tagname = Value[..^(connectedParameter.Length + 1)];
-                TdcTagDict.TryGetValue(tagname, out connectedTag);
+                TdcTagDict?.TryGetValue(tagname, out connectedTag);
             }
         }
     }

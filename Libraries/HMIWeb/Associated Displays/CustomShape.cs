@@ -6,7 +6,7 @@ namespace Honeywell.HMIWeb
     public class CustomShape
     {
         public string ShapeName { get; set; } = null!;
-        public string SubShapeName { get; set; } = null!;
+        public string? SubShapeName { get; set; }
         public string? PointName { get; set; }
         public string? ParameterName { get; set; }
         public string? MiscProp { get; set; }
