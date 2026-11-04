@@ -8,6 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>map.ico</ApplicationIcon>
     <Copyright>Ⓒ 2023 Evan Brooks Miller, All rights reserved</Copyright>
+    <!-- GViewer (automaticgraphlayout) stores its embedded resources with BinaryFormatter, which .NET 9+ removed from the runtime. Only those built-in resources are read this way. -->
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +22,7 @@
     <PackageReference Include="DockPanelSuite" Version="3.1.1" />
     <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.1" />
     <PackageReference Include="Scintilla5.NET" Version="7.1.1" />
+    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="10.0.14" />
   </ItemGroup>
 
   <ItemGroup>
