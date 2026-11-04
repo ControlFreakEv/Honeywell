@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Honeywell.Database
 {
-    public class DbProject
+    public class DbProject : IDeleteOnImport
     {
         [Key]
         [ImportAndExport(false, true)]

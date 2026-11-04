@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Honeywell.Database
 {
-    public class DbConfigTemplates
+    public class DbConfigTemplates : IDeleteOnImport
     {
         [Key]
         [ImportAndExport(false, true)]

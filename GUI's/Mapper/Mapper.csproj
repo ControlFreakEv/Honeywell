@@ -20,7 +20,6 @@
     <PackageReference Include="DockPanelSuite" Version="3.1.1" />
     <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.1" />
     <PackageReference Include="Scintilla5.NET" Version="7.1.1" />
-    <PackageReference Include="NPOI" Version="2.8.1" />
   </ItemGroup>
 
   <ItemGroup>

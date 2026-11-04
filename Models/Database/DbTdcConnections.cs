@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Honeywell.Database
 {
-    public class DbTdcConnections
+    public class DbTdcConnections : IDeleteOnImport
     {
         [Key]
         [ImportAndExport(false, true)]

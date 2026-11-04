@@ -12,7 +12,6 @@ using System.Runtime.Serialization;
 using Microsoft.Msagl.Layout.LargeGraphLayout;
 using Honeywell.TDC;
 using Honeywell.Database;
-using NPOI.OpenXml4Net.OPC;
 
 namespace Honeywell.Parsers.TDC.Graphs
 {

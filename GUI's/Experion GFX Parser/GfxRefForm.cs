@@ -4,18 +4,13 @@ using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using Microsoft.VisualBasic.FileIO;
 using Honeywell.HMIWeb;
 using System.Linq;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using NPOI.SS.Util;
 using System.Drawing;
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Forms;
 //using ExperionGfx;
 using System.Diagnostics;
-//using NPOI.SS.Formula.Functions;
 
 namespace Honeywell.GUI.ExperionGfx
 {
@@ -34,137 +29,33 @@ namespace Honeywell.GUI.ExperionGfx
 
         private void ExportButton_Click(object sender, EventArgs e)
         {
-            //ExportToCsv();
             ExportToXlsx();
         }
 
         private string GetXlsxPath() => $@"{GfxPath.Text}\Associated Displays.xlsx";
-        private string XlsxSheet = "Gfx Refs";
 
         private void ExportToXlsx()
         {
+            if (AssociatedDisplayDataGrid.Rows.Count == 0 || AssociatedDisplayDataGrid.DataSource is not DataTable table)
+            {
+                MessageBox.Show("Nothing to Export. Click 'Go' first.");
+                return;
+            }
+
             string filePath = GetXlsxPath();
             try
             {
-                if (AssociatedDisplayDataGrid.Rows.Count == 0)
-                {
-                    MessageBox.Show("Nothing to Export. Click 'Go' first.");
-                    return;
-                }
-
-                //create workbook
-                IWorkbook workbook = new XSSFWorkbook();
-                int colIndex = 0;
-                int rowIndex = 0;
-                ISheet ws = workbook.CreateSheet(XlsxSheet);
-                IRow row = ws.CreateRow(rowIndex++);
-
-                //create headers
-                var dict = GetDataTableMapping();
-                var numericColumnIndex = new List<int>();
-                foreach (var kv in dict)
-                {
-                    if (kv.Key == nameof(Shape.CsvIndex) || kv.Key == nameof(Shape.UniqueShapeId))
-                        numericColumnIndex.Add(colIndex);
-
-                    row.CreateCell(colIndex++).SetCellValue(kv.Value);
-                }
-
-                //populate data
-                var dt = (DataTable?)AssociatedDisplayDataGrid.DataSource;
-                if (dt == null)
-                {
-                    MessageBox.Show("Nothing to Export. Click 'Go' first.");
-                    return;
-                }
-                foreach (DataRow dr in dt.Rows)
-                {
-                    row = ws.CreateRow(rowIndex++);
-                    colIndex = 0;
-                    foreach (DataColumn dc in dt.Columns)
-                    {
-                        var cell = row.CreateCell(colIndex);
-
-                        var cellValue = dr[dc].ToString();
-                        //set value
-                        if (numericColumnIndex.Contains(colIndex))
-                        {
-                            if (int.TryParse(cellValue, out int numericValue))
-                                cell.SetCellValue(numericValue);
-                            else
-                                cell.SetCellValue(cellValue);
-                        }
-                        else
-                            cell.SetCellValue(cellValue);
-
-                        colIndex++;
-                    }
-                }
-
-                //format sheets
-                ws.CreateFreezePane(0, 1, 0, 1);
-                ws.SetAutoFilter(new CellRangeAddress(0, ws.LastRowNum, 0, --colIndex));
-                //for (int i = 0; i <= colIndex; i++)
-                //    ws.AutoSizeColumn(i);
-
-
-                //save file
-                using FileStream stream = new(filePath, FileMode.Create, FileAccess.Write);
-                workbook.Write(stream, false);
-                
-
+                ShapeWorkbook.Export(table, GetDataTableMapping(), filePath);
                 MessageBox.Show($"File saved at \n{filePath}");
             }
-            catch (IOException ex)
+            catch (IOException)
             {
-                if (ex.Message.Contains("The process cannot access the file"))
-                    MessageBox.Show($"Close {filePath} and try again.");
-            }
-        }
-
-        /// <summary>
-        /// deprecated
-        /// </summary>
-        private void ExportToCsv()
-        {
-            string filePath = $@"{GfxPath.Text}\Associated Displays.csv";
-            try
-            {
-                if (AssociatedDisplayDataGrid.Rows.Count == 0)
-                {
-                    MessageBox.Show("Nothing to Export. Click 'Go' first.");
-                    return;
-                }
-
-                StringBuilder sb = new StringBuilder();
-                var dt = (DataTable?)AssociatedDisplayDataGrid.DataSource;
-                if (dt == null)
-                {
-                    MessageBox.Show("Nothing to Export. Click 'Go' first.");
-                    return;
-                }
-                IEnumerable<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
-                sb.AppendLine(string.Join(",", columnNames));
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    IEnumerable<string> fields = row.ItemArray.Select(field => string.Concat("\"", field?.ToString()?.Replace("\"", "\"\""), "\""));
-                    sb.AppendLine(string.Join(",", fields));
-                }
-
-                File.WriteAllText(filePath, sb.ToString());
-                MessageBox.Show($"File saved at \n{filePath}");
-            }
-            catch (IOException ex)
-            {
-                if (ex.Message.Contains("The process cannot access the file"))
-                    MessageBox.Show($"Close {filePath} and try again.");
+                MessageBox.Show($"Close {filePath} and try again.");
             }
         }
 
         private void ImportButton_Click(object sender, EventArgs e)
         {
-            //ImportCsv();
             ImportXlxs();
         }
 
@@ -172,183 +63,25 @@ namespace Honeywell.GUI.ExperionGfx
         {
             string filePath = GetXlsxPath();
             if (!File.Exists(filePath))
+            {
                 MessageBox.Show($"{filePath} does not exist");
-            else
-            {
-                var shapeList = new ConcurrentBag<Shape>();
-                
-
-                //open workbook
-                using FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                IWorkbook workbook = new XSSFWorkbook(stream);
-                var ws = workbook.GetSheet(XlsxSheet);
-                if (ws == null)
-                    throw new Exception($"Could not locate worksheet {XlsxSheet}");
-
-                //locate headers
-                var headerMap = GetDataTableMapping();
-                var headerDict = new Dictionary<string, int>();
-                var headerRow = ws.GetRow(0);
-                foreach (KeyValuePair<string, string> kv in headerMap)
-                {
-                    var header = headerRow.Cells.FirstOrDefault(x => x.StringCellValue == kv.Value);
-                    if (header?.StringCellValue == null)
-                    {
-                        var response = MessageBox.Show($"Could not find header {kv.Value}", "Warning: Missing Column", MessageBoxButtons.OKCancel);
-                        if (response == DialogResult.Cancel)
-                            return;
-                    }
-                    headerDict[kv.Key] = header?.ColumnIndex ?? -1;
-                }
-
-                //for (int k = 1; k <= ws.LastRowNum; k++)
-                Parallel.For(1, ws.LastRowNum + 1, k =>
-                {
-                    var row = ws.GetRow(k);
-                    var shapeSource = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.ShapeSource)]);
-                    var graphic = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.Graphic)]);
-                    var shapeName = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.ShapeName)]);
-                    var shapePath = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.ShapePath)]);
-                    var point = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.Point)]);
-                    var parameter = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.Parameter)]);
-                    var dataType = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.DataType)]);
-                    var dataObjectId = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.DataObjectId)]);
-                    var bindingId = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.BindingId)]);
-                    var newPoint = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.NewPoint)]);
-                    var newParameter = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.NewParameter)]);
-                    var customParamPointName = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.CustomParamPointName)]);
-                    var customParamParameterName = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.CustomParamParameterName)]);
-                    var replaceShapeName = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.ReplaceShapeName)]);
-                    var customParamType = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.CustomParamType)]);
-                    var csvIndex = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.CsvIndex)]);
-                    var miscPropValue = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.MiscPropValue)]);
-                    var customPropMiscName = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.CustomPropMiscName)]);
-                    var newMiscPropValue = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.NewMiscPropValue)]);
-                    var gfxAndShape = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.GfxAndShape)]);
-                    var gfxAndShapeId = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.UniqueShapeId)]);
-                    var tooltip = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.Tooltip)]);
-                    var newTooltip = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.NewTooltip)]);
-                    var css = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.Css)]);
-                    var newCss = row.Cells.FirstOrDefault(x => x.ColumnIndex == headerDict[nameof(Shape.NewCss)]);
-
-                    var shape = new Shape()
-                    {
-                        ShapeSource = shapeSource.ConvertToString(),
-                        Graphic = graphic.ConvertToString(),
-                        ShapeName = shapeName.ConvertToString(),
-                        ShapePath = shapePath.ConvertToString(),
-                        Point = point.ConvertToString(),
-                        Parameter = parameter.ConvertToString(),
-                        DataType = Shape.ParseObjectType(dataType.ConvertToString()),
-                        DataObjectId = dataObjectId.ConvertToString(),
-                        BindingId = bindingId.ConvertToString(),
-                        NewPoint = newPoint.ConvertToString(),
-                        NewParameter = newParameter.ConvertToString(),
-                        CustomParamPointName = customParamPointName.ConvertToString(),
-                        CustomParamParameterName = customParamParameterName.ConvertToString(),
-                        CustomParamType = Shape.ParseObjectType(customParamType.ConvertToString()),
-                        CsvIndex = csvIndex.ConvertToInt() ?? 0,
-                        ReplaceShapeName = replaceShapeName.ConvertToString(),
-                        MiscPropValue = miscPropValue.ConvertToString(),
-                        CustomPropMiscName = customPropMiscName.ConvertToString(),
-                        NewMiscPropValue = newMiscPropValue.ConvertToString(),
-                        GfxAndShape = gfxAndShape.ConvertToString(),
-                        UniqueShapeId = gfxAndShapeId.ConvertToInt(),
-                        Tooltip = tooltip.ConvertToString(),
-                        NewTooltip = newTooltip.ConvertToString(),
-                        Css = css.ConvertToString(),
-                        NewCss = newCss.ConvertToString(),
-                    };
-                    shapeList.Add(shape);
-                });
-
-                PopulateDataGrid(shapeList);
+                return;
             }
-        }
 
-        /// <summary>
-        /// deprecated
-        /// </summary>
-        private void ImportCsv()
-        {
-            string filePath = $@"{GfxPath.Text}\Associated Displays.csv";
-            if (!File.Exists(filePath))
-                MessageBox.Show($"{filePath} does not exist");
-            else
+            try
             {
-                var shapeList = new ConcurrentBag<Shape>();
-                var dict = GetDataTableMapping().Keys.ToList();
-                var lines = WriteSafeReadAllLines(filePath).Skip(1);
-                Parallel.ForEach(lines, csv =>
-                {
-                    string[]? line;
-                    if (csv.Contains('"'))
-                    {
-                        using (TextFieldParser parser = new TextFieldParser(new StringReader(csv)))
-                        {
-                            parser.TextFieldType = FieldType.Delimited;
-                            parser.HasFieldsEnclosedInQuotes = true;
-                            parser.SetDelimiters(",");
-
-                            line = parser.ReadFields();
-                        }
-                    }
-                    else
-                        line = csv.Split(',');
-                    if (line == null)
-                        return;
-                    int csvIndex = 0;
-                    int.TryParse(line[dict.IndexOf(nameof(Shape.CsvIndex))], out csvIndex);
-
-                    int? gfxAndShapeId = null;
-                    if (int.TryParse(line[dict.IndexOf(nameof(Shape.UniqueShapeId))], out int temp))
-                        gfxAndShapeId = temp;
-
-                    var shape = new Shape()
-                    {
-                        ShapeSource = line[dict.IndexOf(nameof(Shape.ShapeSource))],
-                        Graphic = line[dict.IndexOf(nameof(Shape.Graphic))],
-                        ShapeName = line[dict.IndexOf(nameof(Shape.ShapeName))],
-                        ShapePath = line[dict.IndexOf(nameof(Shape.ShapePath))],
-                        Point = line[dict.IndexOf(nameof(Shape.Point))],
-                        Parameter = line[dict.IndexOf(nameof(Shape.Parameter))],
-                        DataType = Shape.ParseObjectType(line[dict.IndexOf(nameof(Shape.DataType))]),
-                        DataObjectId = line[dict.IndexOf(nameof(Shape.DataObjectId))],
-                        BindingId = line[dict.IndexOf(nameof(Shape.BindingId))],
-                        NewPoint = line[dict.IndexOf(nameof(Shape.NewPoint))],
-                        NewParameter = line[dict.IndexOf(nameof(Shape.NewParameter))],
-                        CustomParamPointName = line[dict.IndexOf(nameof(Shape.CustomParamPointName))],
-                        CustomParamParameterName = line[dict.IndexOf(nameof(Shape.CustomParamParameterName))],
-                        CustomParamType = Shape.ParseObjectType(line[dict.IndexOf(nameof(Shape.CustomParamType))]),
-                        CsvIndex = csvIndex,
-                        ReplaceShapeName = line[dict.IndexOf(nameof(Shape.ReplaceShapeName))],
-                        MiscPropValue = line[dict.IndexOf(nameof(Shape.MiscPropValue))],
-                        CustomPropMiscName = line[dict.IndexOf(nameof(Shape.CustomPropMiscName))],
-                        NewMiscPropValue = line[dict.IndexOf(nameof(Shape.NewMiscPropValue))],
-                        GfxAndShape = line[dict.IndexOf(nameof(Shape.GfxAndShape))],
-                        UniqueShapeId = gfxAndShapeId,
-                    };
-                    shapeList.Add(shape);
-                });
-
-                PopulateDataGrid(shapeList);
+                var shapes = ShapeWorkbook.Import(filePath, GetDataTableMapping(), header =>
+                    MessageBox.Show($"Could not find header {header}", "Warning: Missing Column", MessageBoxButtons.OKCancel) != DialogResult.Cancel);
+                if (shapes != null)
+                    PopulateDataGrid(shapes);
             }
-        }
-
-        public string[] WriteSafeReadAllLines(string path)
-        {
-            using (var csv = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var sr = new StreamReader(csv))
+            catch (IOException)
             {
-                List<string> file = new List<string>();
-                while (!sr.EndOfStream)
-                {
-                    var line = sr.ReadLine();
-                    if (line != null)
-                        file.Add(line);
-                }
-
-                return file.ToArray();
+                MessageBox.Show($"Close {filePath} and try again.");
+            }
+            catch (InvalidDataException ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 

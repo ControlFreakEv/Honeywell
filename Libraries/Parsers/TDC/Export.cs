@@ -1,8 +1,5 @@
-﻿using System.Data;
-using System.Reflection;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using NPOI.SS.Util;
+using ClosedXML.Excel;
+using Honeywell.Excel;
 using Honeywell.TDC;
 
 namespace Honeywell.Parsers.TDC
@@ -11,84 +8,40 @@ namespace Honeywell.Parsers.TDC
     {
         public static void ExportTdcToXlsx(List<TdcTag> tdcTags, string savePath)
         {
-            IWorkbook workbook = new XSSFWorkbook();
+            using var workbook = new XLWorkbook();
 
-            //create TDC tag worksheet
-            int tagCol = 0;
-            int tagRow = 0;
-            ISheet tagWs = workbook.CreateSheet("TDC Tags");
-            IRow row = tagWs.CreateRow(tagRow++);
-            row.CreateCell(tagCol++).SetCellValue("Module");
-            row.CreateCell(tagCol++).SetCellValue("TDC Tag");
-            row.CreateCell(tagCol++).SetCellValue("Point Type");
-            row.CreateCell(tagCol++).SetCellValue("Module Description");
-            row.CreateCell(tagCol++).SetCellValue("TDC Tag Description");
-            row.CreateCell(tagCol++).SetCellValue("EB File");
-            row.CreateCell(tagCol++).SetCellValue("NTWKNUM");
-            row.CreateCell(tagCol++).SetCellValue("NODENUM");
-            row.CreateCell(tagCol++).SetCellValue("SLOTNUM");
-            row.CreateCell(tagCol++).SetCellValue("MODNUM");
-            row.CreateCell(tagCol++).SetCellValue("NODETYP");
-            row.CreateCell(tagCol++).SetCellValue("PVALGID");
-            row.CreateCell(tagCol++).SetCellValue("CTLALGID");
-
-            //create parameter worksheet
-            int parameterCol = 0;
-            int parameterRow = 0;
-            ISheet paramWs = workbook.CreateSheet("Parameters");
-            row = paramWs.CreateRow(parameterRow++);
-            row.CreateCell(parameterCol++).SetCellValue("TDC Tag");
-            row.CreateCell(parameterCol++).SetCellValue("Parameter");
-            row.CreateCell(parameterCol++).SetCellValue("Value");
-
-            for (int i = 0; i < tdcTags.Count; i++)
+            var tagSheet = workbook.Worksheets.Add("TDC Tags");
+            tagSheet.WriteHeaders(new[]
             {
-                TdcTag? tag = tdcTags[i];
-                tagCol = 0;
-                row = tagWs.CreateRow(tagRow++);
+                "Module", "TDC Tag", "Point Type", "Module Description", "TDC Tag Description", "EB File",
+                "NTWKNUM", "NODENUM", "SLOTNUM", "MODNUM", "NODETYP", "PVALGID", "CTLALGID",
+            });
 
-                row.CreateCell(tagCol++).SetCellValue(tag.Module?.Name);
-                row.CreateCell(tagCol++).SetCellValue(tag.Name);
-                row.CreateCell(tagCol++).SetCellValue(tag.PointType);
-                row.CreateCell(tagCol++).SetCellValue(tag.Module?.Desc);
-                row.CreateCell(tagCol++).SetCellValue(tag.Desc);
-                row.CreateCell(tagCol++).SetCellValue(tag.EbFile);
-                row.CreateCell(tagCol++).SetCellValue(tag.NTWKNUM);
-                row.CreateCell(tagCol++).SetCellValue(tag.NODENUM);
-                row.CreateCell(tagCol++).SetCellValue(tag.SLOTNUM);
-                row.CreateCell(tagCol++).SetCellValue(tag.MODNUM);
-                row.CreateCell(tagCol++).SetCellValue(tag.NODETYP);
-                row.CreateCell(tagCol++).SetCellValue(tag.PVALGID);
-                row.CreateCell(tagCol++).SetCellValue(tag.CTLALGID);
+            var parameterSheet = workbook.Worksheets.Add("Parameters");
+            parameterSheet.WriteHeaders(new[] { "TDC Tag", "Parameter", "Value" });
+
+            int tagRow = 2;
+            int parameterRow = 2;
+            foreach (var tag in tdcTags)
+            {
+                tagSheet.WriteRow(tagRow++, new XLCellValue[]
+                {
+                    tag.Module?.Name, tag.Name, tag.PointType, tag.Module?.Desc, tag.Desc, tag.EbFile,
+                    tag.NTWKNUM, tag.NODENUM, tag.SLOTNUM, tag.MODNUM, tag.NODETYP, tag.PVALGID, tag.CTLALGID,
+                });
 
                 foreach (var parameter in tag.Params)
-                {
                     if (parameter != null)
-                    {
-                        parameterCol = 0;
-                        row = paramWs.CreateRow(parameterRow++);
-
-                        row.CreateCell(parameterCol++).SetCellValue(parameter.ParentTag.Name);
-                        row.CreateCell(parameterCol++).SetCellValue(parameter.Name);
-                        row.CreateCell(parameterCol++).SetCellValue(parameter.Value);
-                    }
-                }
+                        parameterSheet.WriteRow(parameterRow++, new XLCellValue[] { parameter.ParentTag.Name, parameter.Name, parameter.Value });
             }
 
-            //format sheets
-            tagWs.CreateFreezePane(0, 1, 0, 1);
-            tagWs.SetAutoFilter(new CellRangeAddress(0, --tagRow, 0, --tagCol));
-            for (int i = 0; i <= tagCol; i++)
-                tagWs.AutoSizeColumn(i);
+            foreach (var sheet in new[] { tagSheet, parameterSheet })
+            {
+                sheet.FreezeHeaderAndFilter();
+                sheet.Columns().AdjustToContents();
+            }
 
-            paramWs.CreateFreezePane(0, 1, 0, 1);
-            paramWs.SetAutoFilter(new CellRangeAddress(0, --parameterRow, 0, --parameterCol));
-            for (int i = 0; i <= parameterCol; i++)
-                paramWs.AutoSizeColumn(i);
-
-            //save file
-            using FileStream stream = new(savePath, FileMode.Create, FileAccess.Write);
-            workbook.Write(stream);
+            workbook.SaveAs(savePath);
         }
 
         public static void ExportGroups(List<TdcGroup> tdcGroups, string savePath)
@@ -96,65 +49,36 @@ namespace Honeywell.Parsers.TDC
             if (tdcGroups.Count == 0)
                 return;
 
-            IWorkbook workbook = new XSSFWorkbook();
+            using var workbook = new XLWorkbook();
+            var sheet = workbook.Worksheets.Add("TDC Groups");
 
-            //create TDC group worksheet
-            int groupCol = 0;
-            int groupRow = 0;
-            ISheet groupWs = workbook.CreateSheet("TDC Groups");
-            IRow row = groupWs.CreateRow(groupRow++);
-            row.CreateCell(groupCol++).SetCellValue("EbFile");
-            row.CreateCell(groupCol++).SetCellValue("OENTNUMP");
-            row.CreateCell(groupCol++).SetCellValue("TITLE");
+            // Every group has the same array lengths, so the first one sizes the columns
+            var first = tdcGroups[0];
+            var headers = new List<string> { "EbFile", "OENTNUMP", "TITLE" };
+            headers.AddRange(IndexedHeaders("EXTIDLST", first.EXTIDLST.Length, TdcGroup.OffsetEXTIDLST));
+            headers.AddRange(IndexedHeaders("TRNDSET", first.TRNDSET.Length, TdcGroup.OffsetTRNDSET));
+            headers.Add("TRNDBASE");
+            headers.AddRange(IndexedHeaders("SCREENUM", first.SCREENUM.Length, TdcGroup.OffsetSCREENUM));
+            headers.AddRange(IndexedHeaders("DISPID", first.DISPID.Length, TdcGroup.OffsetDISPID));
+            sheet.WriteHeaders(headers);
 
-            for (int i = 0; i < tdcGroups[0].EXTIDLST.Length; i++)
-                row.CreateCell(groupCol++).SetCellValue($"EXTIDLST[{i + TdcGroup.OffsetEXTIDLST}]");
-
-            for (int i = 0; i < tdcGroups[0].TRNDSET.Length; i++)
-                row.CreateCell(groupCol++).SetCellValue($"TRNDSET[{i + TdcGroup.OffsetTRNDSET}]");
-
-            row.CreateCell(groupCol++).SetCellValue("TRNDBASE");
-
-            for (int i = 0; i < tdcGroups[0].SCREENUM.Length; i++)
-                row.CreateCell(groupCol++).SetCellValue($"SCREENUM[{+TdcGroup.OffsetSCREENUM}]");
-
-            for (int i = 0; i < tdcGroups[0].DISPID.Length; i++)
-                row.CreateCell(groupCol++).SetCellValue($"DISPID[{+TdcGroup.OffsetDISPID}]");
-
-            //populate data
-            foreach (TdcGroup group in tdcGroups)
+            int rowNumber = 2;
+            foreach (var group in tdcGroups)
             {
-                groupCol = 0;
-                row = groupWs.CreateRow(groupRow++);
-
-                row.CreateCell(groupCol++).SetCellValue(group.EbFile);
-                row.CreateCell(groupCol++).SetCellValue(group.OENTNUMP);
-                row.CreateCell(groupCol++).SetCellValue(group.TITLE);
-
-                for (int i = 0; i < tdcGroups[0].EXTIDLST.Length; i++)
-                    row.CreateCell(groupCol++).SetCellValue(group.EXTIDLST[i]);
-
-                for (int i = 0; i < tdcGroups[0].TRNDSET.Length; i++)
-                    row.CreateCell(groupCol++).SetCellValue(group.TRNDSET[i]);
-
-                row.CreateCell(groupCol++).SetCellValue(group.TRNDBASE);
-
-                for (int i = 0; i < tdcGroups[0].SCREENUM.Length; i++)
-                    row.CreateCell(groupCol++).SetCellValue(group.SCREENUM[i]);
-
-                for (int i = 0; i < tdcGroups[0].DISPID.Length; i++)
-                    row.CreateCell(groupCol++).SetCellValue(group.DISPID[i]);
+                var values = new List<XLCellValue> { group.EbFile, group.OENTNUMP, group.TITLE };
+                values.AddRange(group.EXTIDLST.Select(value => (XLCellValue)value));
+                values.AddRange(group.TRNDSET.Select(value => (XLCellValue)value));
+                values.Add(group.TRNDBASE);
+                values.AddRange(group.SCREENUM.Select(value => (XLCellValue)value));
+                values.AddRange(group.DISPID.Select(value => (XLCellValue)value));
+                sheet.WriteRow(rowNumber++, values);
             }
 
-            //format sheets
-            groupWs.CreateFreezePane(0, 1, 0, 1);
-            groupWs.SetAutoFilter(new CellRangeAddress(0, --groupRow, 0, --groupCol));
-            //for (int i = 0; i <= groupCol; i++)
-            //    groupWs.AutoSizeColumn(i);
-
-            //save file
-            using FileStream stream = new(savePath, FileMode.Create, FileAccess.Write);
-            workbook.Write(stream);
+            sheet.FreezeHeaderAndFilter();
+            workbook.SaveAs(savePath);
         }
+
+        private static IEnumerable<string> IndexedHeaders(string name, int count, int offset) =>
+            Enumerable.Range(offset, count).Select(index => $"{name}[{index}]");
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Honeywell.Database
 {
-    public class DbExperionParameter
+    public class DbExperionParameter : IDeleteOnImport
     {
         [Key]
         [ImportAndExport(false, true)]

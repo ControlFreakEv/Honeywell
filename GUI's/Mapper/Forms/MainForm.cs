@@ -6,8 +6,6 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Honeywell.TDC;
 using Honeywell.GUI.Mapper.Properties;
 using Honeywell.GUI.Mapper.Forms;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Windows.Forms;
@@ -460,143 +458,37 @@ namespace Honeywell.GUI.Mapper
                 var filePath = fd.FileName;
                 try
                 {
-                    using FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    IWorkbook workbook = new XSSFWorkbook(stream);
-
-                    var refreshModules = false;
-                    var db = new TdcContext();
-                    for (int i = 0; i < workbook.NumberOfSheets; i++)
-                    {
-                        var ws = workbook.GetSheetAt(i);
-                        if (ws == null)
-                            continue;
-
-                        if (ws.SheetName == ExportForm.Projects)
-                        {
-                            ExcelHelper<DbProject>.ImportSheet(ws, db.Projects);
-
-                            db.SaveChanges();
-                            var delete = db.Projects.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.Projects.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.TdcModules)
-                        {
-                            ExcelHelper<DbTdcModule>.ImportSheet(ws, db.TdcModules);
-                            refreshModules = true;
-
-                            db.SaveChanges();
-                            var delete = db.TdcModules.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.TdcModules.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.ExperionParameters)
-                        {
-                            ExcelHelper<DbExperionParameter>.ImportSheet(ws, db.ExperionParameters);
-
-                            db.SaveChanges();
-                            var delete = db.ExperionParameters.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.ExperionParameters.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.ConfigTemplates)
-                        {
-                            ExcelHelper<DbConfigTemplates>.ImportSheet(ws, db.ConfigTemplates);
-
-                            db.SaveChanges();
-                            var delete = db.ConfigTemplates.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.ConfigTemplates.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.TdcNodes)
-                        {
-                            ExcelHelper<DbTdcNode>.ImportSheet(ws, db.TdcNodes);
-                            refreshModules = true;
-
-                            db.SaveChanges();
-                            var delete = db.TdcNodes.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.TdcNodes.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.TdcTags)
-                        {
-                            ExcelHelper<DbTdcTag>.ImportSheet(ws, db.TdcTags);
-
-                            db.SaveChanges();
-                            var delete = db.TdcTags.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.TdcTags.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.TdcParameters)
-                        {
-                            ExcelHelper<DbTdcParameter>.ImportSheet(ws, db.TdcParameters);
-
-                            db.SaveChanges();
-                            var delete = db.TdcParameters.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.TdcParameters.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.TdcConnections)
-                        {
-                            ExcelHelper<DbTdcConnections>.ImportSheet(ws, db.ParameterConnections);
-
-                            db.SaveChanges();
-                            var delete = db.ParameterConnections.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.ParameterConnections.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.TdcCl)
-                        {
-                            ExcelHelper<DbTdcCL>.ImportSheet(ws, db.TdcCLs);
-
-                            db.SaveChanges();
-                            var delete = db.TdcCLs.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.TdcCLs.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.TdcClRefs)
-                        {
-                            ExcelHelper<DbTdcCLRefs>.ImportSheet(ws, db.TdcCLRefs);
-
-                            db.SaveChanges();
-                            var delete = db.TdcCLRefs.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.TdcCLRefs.Remove(entity);
-                        }
-                        else if (ws.SheetName == ExportForm.TdcFileRef)
-                        {
-                            ExcelHelper<DbTdcFileRef>.ImportSheet(ws, db.TdcFileRefs);
-
-                            db.SaveChanges();
-                            var delete = db.TdcFileRefs.Where(x => x.DeleteOnImport);
-                            foreach (var entity in delete)
-                                db.TdcFileRefs.Remove(entity);
-                        }
-                    }
-
-                    db.SaveChanges();
-
-                    if (refreshModules)
+                    if (DatabaseWorkbook.Import(filePath))
                     {
                         Helper.RefreshModulesInGraphs();
                         RefreshModules();
-
-                        var blankModules = db.TdcModules.Where(x => !x.Nodes.Any()).ToList();
-                        if (blankModules.Any())
-                        {
-                            var result = MessageBox.Show("Remove Unused Modules?", "Remove Unused Modules?", MessageBoxButtons.YesNo);
-                            if (result == DialogResult.Yes)
-                            {
-                                foreach (var blankModule in blankModules)
-                                    db.TdcModules.Remove(blankModule);
-                            }
-                        }
+                        OfferToRemoveUnusedModules();
                     }
+                }
+                catch (InvalidDataException ex)
+                {
+                    MessageBox.Show(ex.Message);
                 }
                 catch (IOException)
                 {
                     MessageBox.Show($"Close {filePath} and try again");
                 }
+            }
+        }
+
+        private static void OfferToRemoveUnusedModules()
+        {
+            using var db = new TdcContext();
+            var unusedModules = db.TdcModules.Where(x => !x.Nodes.Any()).ToList();
+            if (unusedModules.Count == 0)
+                return;
+
+            var result = MessageBox.Show("Remove Unused Modules?", "Remove Unused Modules?", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                db.TdcModules.RemoveRange(unusedModules);
+                db.SaveChanges();
+                RefreshModules();
             }
         }
 

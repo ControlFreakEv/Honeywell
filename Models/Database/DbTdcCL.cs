@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Honeywell.Database
 {
-    public class DbTdcCL
+    public class DbTdcCL : IDeleteOnImport
     {
         [Key]
         [ImportAndExport(false, true)]
