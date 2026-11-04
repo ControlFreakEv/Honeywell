@@ -96,18 +96,8 @@ namespace Honeywell.GUI.Parser
 
         private void CreateEbButton1_Click(object sender, EventArgs e)
         {
-            Parsers.TDC.Parser.CreateEBsFromD3K(D3KTextBox.Text, CdsTextBox.Text, HgIOWithoutTagsTextBox.Text);
-            MessageBox.Show($"EB file saved at \n{Parsers.TDC.Parser.D3kEbFilePath}");
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            var procmodFile = "LY9185P.CL";
-
-            //Parser.ParseTdc(@"C:\Users\ebmiller\OneDrive - Hargrove Engineers + Constructors\Current Projects\OxyChem F550 & 570\EB", @"C:\Users\ebmiller\OneDrive - Hargrove Engineers + Constructors\Current Projects\OxyChem F550 & 570\CL", false);
-
-            var cl = Parsers.TDC.Parser.TdcCL.First(x => x.FileName == procmodFile);
-
+            Parsers.TDC.D3kImporter.CreateEbFile(D3KTextBox.Text, CdsTextBox.Text, HgIOWithoutTagsTextBox.Text);
+            MessageBox.Show($"EB file saved at \n{Parsers.TDC.D3kImporter.EbFilePath}");
         }
 
         private void ImportD3kFileRefsButton_Click(object sender, EventArgs e)
@@ -127,7 +117,7 @@ namespace Honeywell.GUI.Parser
                 return;
             }
             else if (fileRefsConnectionPath != null)
-                Parsers.TDC.Parser.ImportFileRefsFromD3k(fileRefsConnectionPath);
+                Parsers.TDC.D3kImporter.ImportFileRefs(fileRefsConnectionPath);
         }
 
         private void ParseGroupButton_Click(object sender, EventArgs e)
