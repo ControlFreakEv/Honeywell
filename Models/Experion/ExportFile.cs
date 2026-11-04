@@ -6,7 +6,7 @@
     //function blocks = MultiBlock-Block-EmbBlocks
     public class ExportFile
     {
-        public string ParentBlockType { get; set; }
+        public string ParentBlockType { get; set; } = null!;
 
         public ExportFile(string xmlContent)
         {

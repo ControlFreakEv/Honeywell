@@ -11,8 +11,8 @@ namespace Honeywell.GUI.Mapper
     {
         public string SourceTagName { get; set; }
         public string TargetTagName { get; set; }
-        public string SourceAddress { get; set; }
-        public string TargetAddress { get; set; }
+        public string SourceAddress { get; set; } = null!;
+        public string TargetAddress { get; set; } = null!;
         public int GraphId { get; set; }
 
         public CrossComms(DbTdcNode sourceNode, DbTdcNode targetNode)

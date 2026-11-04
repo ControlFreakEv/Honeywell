@@ -14,7 +14,7 @@ namespace Honeywell.GUI.Mapper
 {
     public partial class FileRefsDgvForm : DockContent
     {
-        List<DbTdcFileRef> originalDataSource;
+        List<DbTdcFileRef>? originalDataSource;
         string formText = "File References";
         public FileRefsDgvForm()
         {
@@ -24,18 +24,24 @@ namespace Honeywell.GUI.Mapper
 
         private void AdvancedDataGridView1_SortStringChanged(object sender, Zuby.ADGV.AdvancedDataGridView.SortEventArgs e)
         {
-            UpdateDataSource(DgvHelper<DbTdcFileRef>.GetSortedDataSource(e, AdvancedDataGridView.DataSource));
+            ShowRows(DgvHelper<DbTdcFileRef>.GetSortedDataSource(e, AdvancedDataGridView.DataSource));
         }
 
         private void AdvancedDataGridView1_FilterStringChanged(object sender, Zuby.ADGV.AdvancedDataGridView.FilterEventArgs e)
         {
-            UpdateDataSource(DgvHelper<DbTdcFileRef>.GetFilteredDataSource(e, originalDataSource, AdvancedDataGridView.DataSource));
+            ShowRows(DgvHelper<DbTdcFileRef>.GetFilteredDataSource(e, originalDataSource, AdvancedDataGridView.DataSource));
+        }
+
+        private void ShowRows(List<DbTdcFileRef> rows)
+        {
+            AdvancedDataGridView.DataSource = rows;
+            this.Text = $"{formText} ({rows.Count})";
         }
 
         public void UpdateDataSource(List<DbTdcFileRef> datasource, bool reapplySortAndFilter = false)
         {
-            AdvancedDataGridView.DataSource = datasource;
-            this.Text = $"{formText} ({datasource.Count})";
+            originalDataSource = datasource;
+            ShowRows(datasource);
 
             if (reapplySortAndFilter)
             {

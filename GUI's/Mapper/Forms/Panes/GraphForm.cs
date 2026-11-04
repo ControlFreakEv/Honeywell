@@ -35,7 +35,7 @@ namespace Honeywell.GUI.Mapper
         Rectangle screenDragRectangle = new Rectangle(new Point(0, 0), new Size(0, 0));
         Point startScreenPoint;
         System.Drawing.Point mouseDownPoint;
-        PlaneTransformation mouseDownTransform;
+        PlaneTransformation? mouseDownTransform;
         List<Node> dragNodes = new();
         List<GraphModuleUpdates> moduleUpdates = new();
         string? graphId = null;

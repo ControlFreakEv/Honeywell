@@ -40,12 +40,12 @@ namespace Honeywell.GUI.ExperionGfx
             return null;
         }
 
-        public static bool ContainsNoCase(this List<string?> list, string? contains)
+        public static bool ContainsNoCase(this IEnumerable<string?> list, string? contains)
         {
             return list.Contains(contains, StringComparer.OrdinalIgnoreCase);
         }
 
-        public static bool ContainsNoCase(this List<string?> list, string?[] contains)
+        public static bool ContainsNoCase(this IEnumerable<string?> list, string?[] contains)
         {
             foreach (var item in contains)
             {

@@ -38,7 +38,7 @@ namespace Honeywell.GUI.Mapper
             }
             return currentDataSource;
         }
-        public static List<T> GetFilteredDataSource(AdvancedDataGridView.FilterEventArgs e, List<T> originalDataSource, object datasource)
+        public static List<T> GetFilteredDataSource(AdvancedDataGridView.FilterEventArgs e, List<T>? originalDataSource, object datasource)
         {
             if (originalDataSource == null)
                 originalDataSource = (List<T>)datasource;

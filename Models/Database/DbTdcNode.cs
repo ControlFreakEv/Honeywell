@@ -14,7 +14,7 @@ namespace Honeywell.Database
         public int Id { get; set; }
 
         [ImportAndExport(true, true)]
-        public string NodeId { get; set; }
+        public string NodeId { get; set; } = null!;
 
         [ImportAndExport(true, true)]
         public int? TagId { get; set; }
@@ -30,12 +30,12 @@ namespace Honeywell.Database
 
         [ImportAndExport(false, true)]
         public virtual DbTdcTag? Tag { get; set; }
-        public virtual DbTdcGraph Graph { get; set; }
+        public virtual DbTdcGraph Graph { get; set; } = null!;
 
         [ImportAndExport(false, true)]
         public virtual DbTdcModule? Module { get; set; }
-        public virtual ICollection<DbTdcSourceCrossComm> SourceCrossComms { get; set; }
-        public virtual ICollection<DbTdcTargetCrossComm> TargetCrossComms { get; set; }
-        public virtual ICollection<DbTdcConnections> ParameterConnections { get; set; }
+        public virtual ICollection<DbTdcSourceCrossComm> SourceCrossComms { get; set; } = null!;
+        public virtual ICollection<DbTdcTargetCrossComm> TargetCrossComms { get; set; } = null!;
+        public virtual ICollection<DbTdcConnections> ParameterConnections { get; set; } = null!;
     }
 }

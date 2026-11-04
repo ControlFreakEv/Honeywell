@@ -27,10 +27,10 @@ namespace Honeywell.Database
         public bool DeleteOnImport { get; set; }
 
         [ImportAndExport(false, true)]
-        public virtual DbTdcTag Tag { get; set; }
+        public virtual DbTdcTag Tag { get; set; } = null!;
 
         [ImportAndExport(false, true)]
-        public virtual DbTdcCL CL { get; set; }
+        public virtual DbTdcCL CL { get; set; } = null!;
 
         public DbTdcCLRefs()
         {

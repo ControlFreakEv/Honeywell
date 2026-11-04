@@ -18,7 +18,7 @@ namespace Honeywell.Database
         public int FunctionBlockId { get; set; }
 
         [ImportAndExport(true, true)]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [ImportAndExport(true, true)]
         public string? Value { get; set; }

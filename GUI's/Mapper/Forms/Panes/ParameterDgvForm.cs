@@ -16,7 +16,7 @@ namespace Honeywell.GUI.Mapper
 {
     public partial class ParameterDgvForm : DockContent
     {
-        List<DbTdcParameter> originalDataSource;
+        List<DbTdcParameter>? originalDataSource;
         static string formText = "TDC Parameters";
         public ParameterDgvForm()
         {

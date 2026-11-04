@@ -99,24 +99,6 @@
         }
 
         #endregion
-        private DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn pointTypeDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn nTWKNUMDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn nODENUMDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn aMDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn nODETYPDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn idDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn descDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn ebFileDataGridViewTextBoxColumn;
-        private DataGridViewCheckBoxColumn packageExistsDataGridViewCheckBoxColumn;
-        private DataGridViewTextBoxColumn hWYNUMDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn bOXNUMDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn sLOTNUMDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn mODNUMDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn pVALGIDDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn cTLALGIDDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn paramsDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn nodesDataGridViewTextBoxColumn;
         //public ToolStripTextBox MaxNodes = new() { Text = "1000"};
         public Microsoft.Msagl.GraphViewerGdi.GViewer gViewer;
     }

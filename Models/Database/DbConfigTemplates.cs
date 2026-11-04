@@ -15,12 +15,12 @@ namespace Honeywell.Database
         public int Id { get; set; }
 
         [ImportAndExport(true, true)]
-        public string TypicalName { get; set; }
+        public string TypicalName { get; set; } = null!;
 
         [ImportAndExport(true, true)]
         public bool DeleteOnImport { get; set; }
-        public virtual ICollection<DbTdcModule> Modules { get; set; }
-        public virtual ICollection<DbExperionFunctionBlock> FunctionBlocks { get; set; }
+        public virtual ICollection<DbTdcModule> Modules { get; set; } = null!;
+        public virtual ICollection<DbExperionFunctionBlock> FunctionBlocks { get; set; } = null!;
 
         public DbConfigTemplates()
         {

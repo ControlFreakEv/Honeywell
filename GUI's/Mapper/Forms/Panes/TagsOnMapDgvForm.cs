@@ -14,7 +14,7 @@ namespace Honeywell.GUI.Mapper
 {
     public partial class TagsOnMapDgvForm : DockContent
     {
-        List<TagsOnMap> originalDataSource;
+        List<TagsOnMap>? originalDataSource;
         string formText = "Tags on Map";
         public TagsOnMapDgvForm()
         {
@@ -24,18 +24,24 @@ namespace Honeywell.GUI.Mapper
 
         private void AdvancedDataGridView1_SortStringChanged(object sender, Zuby.ADGV.AdvancedDataGridView.SortEventArgs e)
         {
-            UpdateDataSource(DgvHelper<TagsOnMap>.GetSortedDataSource(e, AdvancedDataGridView.DataSource));
+            ShowRows(DgvHelper<TagsOnMap>.GetSortedDataSource(e, AdvancedDataGridView.DataSource));
         }
 
         private void AdvancedDataGridView1_FilterStringChanged(object sender, Zuby.ADGV.AdvancedDataGridView.FilterEventArgs e)
         {
-            UpdateDataSource(DgvHelper<TagsOnMap>.GetFilteredDataSource(e, originalDataSource, AdvancedDataGridView.DataSource));
+            ShowRows(DgvHelper<TagsOnMap>.GetFilteredDataSource(e, originalDataSource, AdvancedDataGridView.DataSource));
+        }
+
+        private void ShowRows(List<TagsOnMap> rows)
+        {
+            AdvancedDataGridView.DataSource = rows;
+            this.Text = $"{formText} ({rows.Count})";
         }
 
         public void UpdateDataSource(List<TagsOnMap> datasource, bool reapplySortAndFilter = false)
         {
-            AdvancedDataGridView.DataSource = datasource;
-            this.Text = $"{formText} ({datasource.Count})";
+            originalDataSource = datasource;
+            ShowRows(datasource);
 
             if (reapplySortAndFilter)
             {

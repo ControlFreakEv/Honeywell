@@ -11,8 +11,8 @@ namespace Mapper.Samples
     public static class SampleCl
     {
         public static string SampleClFileName { get; } = "Sample.CL";
-        public static List<string> SampleTagNames { get; private set; }
-        public static List<DbTdcTag> SampleTags { get; private set; }
+        public static List<string> SampleTagNames { get; private set; } = null!;
+        public static List<DbTdcTag> SampleTags { get; private set; } = null!;
         static readonly string sampleFilePath = AppDomain.CurrentDomain.BaseDirectory + "Samples\\";
 
         public static DbTdcCL GetSampleCL()

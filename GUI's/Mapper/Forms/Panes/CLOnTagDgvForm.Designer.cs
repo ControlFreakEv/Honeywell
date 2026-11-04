@@ -186,7 +186,6 @@
         }
 
         #endregion
-        private DataGridViewTextBoxColumn tagReferencesDataGridViewTextBoxColumn;
         private BindingSource DbTdcCLBindingSource;
         private SplitContainer splitContainer1;
         private Zuby.ADGV.AdvancedDataGridViewSearchToolBar advancedDataGridViewSearchToolBar1;

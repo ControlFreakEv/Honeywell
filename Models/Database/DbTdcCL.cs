@@ -18,11 +18,11 @@ namespace Honeywell.Database
         public int? ProjectId { get; set; }
 
         [ImportAndExport(true, true)]
-        public string FileName { get; set; }
+        public string FileName { get; set; } = null!;
         [ImportAndExport(true, true)]
         public string? CLName { get; set; }
-        public string OriginalContent { get; set; }
-        public string Content { get; set; }
+        public string OriginalContent { get; set; } = null!;
+        public string Content { get; set; } = null!;
         public string? Indicators { get; set; }
 
         [ImportAndExport(true, true)]
@@ -33,7 +33,7 @@ namespace Honeywell.Database
 
         [ImportAndExport(false, true)]
         public virtual DbProject? Project { get; set; }
-        public virtual ICollection<DbTdcCLRefs> CLTagReferences { get; set; }
+        public virtual ICollection<DbTdcCLRefs> CLTagReferences { get; set; } = null!;
 
         public DbTdcCL()
         {

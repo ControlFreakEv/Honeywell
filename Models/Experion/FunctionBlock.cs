@@ -10,9 +10,9 @@ namespace Honeywell.Experion
     public class FunctionBlock
     {
         [Required]
-        public string BlockName { get; set; }
+        public string BlockName { get; set; } = null!;
         [Required]
-        public string TemplateName { get; set; }
+        public string TemplateName { get; set; } = null!;
         public List<FunctionBlockParameter> Parameters { get; set; } = new();
 
         public void AddParameter(FunctionBlockParameter param)

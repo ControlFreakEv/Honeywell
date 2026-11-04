@@ -18,7 +18,7 @@ namespace Honeywell.Database
         public int? ConfigTemplateId { get; set; }
 
         [ImportAndExport(true, true)]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [ImportAndExport(true, true)]
         public string? Desc { get; set; }
@@ -49,8 +49,8 @@ namespace Honeywell.Database
 
         [ImportAndExport(false, true)]
         public virtual DbConfigTemplates? ConfigTemplate { get; set; }
-        public virtual ICollection<DbTdcNode> Nodes { get; set; }
-        public virtual ICollection<DbExperionParameter> ExperionParameters { get; set; }
+        public virtual ICollection<DbTdcNode> Nodes { get; set; } = null!;
+        public virtual ICollection<DbExperionParameter> ExperionParameters { get; set; } = null!;
 
         public DbTdcModule()
         {

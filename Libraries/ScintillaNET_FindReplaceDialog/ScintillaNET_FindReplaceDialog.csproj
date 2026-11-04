@@ -13,9 +13,8 @@
     <RootNamespace>ScintillaNET_FindReplaceDialog</RootNamespace>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <!-- Upstream source is kept unmodified; it predates the .NET 9 WinForms serialization analyzer -->
-    <NoWarn>$(NoWarn);WFO1000</NoWarn>
+    <NoWarn>$(NoWarn);WFO1000;CS0649</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

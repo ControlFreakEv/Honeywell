@@ -15,13 +15,13 @@ namespace Honeywell.Database
         public int Id { get; set; }
 
         [ImportAndExport(true, true)]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         [ImportAndExport(true, true)]
         public bool DeleteOnImport { get; set; }
 
-        public virtual ICollection<DbTdcCL> CLs { get; set; }
-        public virtual ICollection<DbTdcTag> Tags { get; set; }
+        public virtual ICollection<DbTdcCL> CLs { get; set; } = null!;
+        public virtual ICollection<DbTdcTag> Tags { get; set; } = null!;
 
         public DbProject()
         {

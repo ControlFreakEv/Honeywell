@@ -15,7 +15,7 @@ namespace Honeywell.GUI.Mapper
 {
     public partial class TagsInCLDgvForm : DockContent
     {
-        List<TagsInCL> originalDataSource;
+        List<TagsInCL>? originalDataSource;
         string formText = "Tags in CL";
         public TagsInCLDgvForm()
         {
@@ -25,18 +25,24 @@ namespace Honeywell.GUI.Mapper
 
         private void AdvancedDataGridView1_SortStringChanged(object sender, Zuby.ADGV.AdvancedDataGridView.SortEventArgs e)
         {
-            UpdateDataSource(DgvHelper<TagsInCL>.GetSortedDataSource(e, AdvancedDataGridView.DataSource));
+            ShowRows(DgvHelper<TagsInCL>.GetSortedDataSource(e, AdvancedDataGridView.DataSource));
         }
 
         private void AdvancedDataGridView1_FilterStringChanged(object sender, Zuby.ADGV.AdvancedDataGridView.FilterEventArgs e)
         {
-            UpdateDataSource(DgvHelper<TagsInCL>.GetFilteredDataSource(e, originalDataSource, AdvancedDataGridView.DataSource));
+            ShowRows(DgvHelper<TagsInCL>.GetFilteredDataSource(e, originalDataSource, AdvancedDataGridView.DataSource));
+        }
+
+        private void ShowRows(List<TagsInCL> rows)
+        {
+            AdvancedDataGridView.DataSource = rows;
+            this.Text = $"{formText} ({rows.Count})";
         }
 
         public void UpdateDataSource(List<TagsInCL> datasource, bool reapplySortAndFilter = false)
         {
-            AdvancedDataGridView.DataSource = datasource;
-            this.Text = $"{formText} ({datasource.Count})";
+            originalDataSource = datasource;
+            ShowRows(datasource);
 
             if (reapplySortAndFilter)
             {

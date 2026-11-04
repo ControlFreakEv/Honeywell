@@ -108,7 +108,7 @@ namespace Honeywell.GUI.Mapper
             MainTagsOnClForm.AdvancedDataGridView.Focus();
         }
 
-        private void TagAdvancedDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void TagAdvancedDataGridView_CellClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
                 return; //filter clicked
@@ -140,7 +140,7 @@ namespace Honeywell.GUI.Mapper
             ParameterDgvForm.UpdateDataSource(MainParameterForm, parameters, true, true);
         }
 
-        private void ModuleAdvancedDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void ModuleAdvancedDataGridView_CellClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
                 return; //filter clicked
@@ -171,7 +171,7 @@ namespace Honeywell.GUI.Mapper
             MainModuleForm.AdvancedDataGridView.Focus();
         }
 
-        private void CrossCommAdvancedDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void CrossCommAdvancedDataGridView_CellClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
                 return; //filter clicked
@@ -190,12 +190,12 @@ namespace Honeywell.GUI.Mapper
             mainCrossCommsForm.AdvancedDataGridView.Focus();
         }
 
-        private void GraphViewer_GraphSavingStarted(object sender, EventArgs e)
+        private void GraphViewer_GraphSavingStarted(object? sender, EventArgs e)
         {
             //todo: save graph to db
         }
 
-        private void GraphViewer_Click(object sender, EventArgs e)
+        private void GraphViewer_Click(object? sender, EventArgs e)
         {
             var node = mainGraphForm.gViewer.SelectedObject as Node;
             if (node != null)
@@ -228,7 +228,7 @@ namespace Honeywell.GUI.Mapper
 
         }
 
-        private void TagsOnMapAdvancedDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void TagsOnMapAdvancedDataGridView_CellClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
                 return; //filter clicked
@@ -258,7 +258,7 @@ namespace Honeywell.GUI.Mapper
                 doc.Activate();
         }
 
-        private void ClOnTagAdvancedDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void ClOnTagAdvancedDataGridView_CellClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
                 return; //filter clicked
@@ -281,7 +281,7 @@ namespace Honeywell.GUI.Mapper
             MainClOnTagForm.AdvancedDataGridView.Focus();
         }
 
-        private void CLAllAdvancedDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void CLAllAdvancedDataGridView_CellClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
                 return; //filter clicked

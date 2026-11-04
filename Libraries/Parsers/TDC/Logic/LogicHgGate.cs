@@ -33,7 +33,7 @@ namespace Honeywell.Parsers.TDC.Logic
         public TdcTag TdcTag { get; set; }
 
 
-        public LogicHgGate(int hwy, int box, int slot, int gateIndex, LogicHGBlockTypes gateType, string fileName, string gateSuffix = null)
+        public LogicHgGate(int hwy, int box, int slot, int gateIndex, LogicHGBlockTypes gateType, string fileName, string? gateSuffix = null)
         {
             Hwy = hwy;
             Box = box;
@@ -121,10 +121,6 @@ namespace Honeywell.Parsers.TDC.Logic
             {
                 logicHg.Input1 = GetValueFromArray(logicArray, 2);
                 logicHg.Time = GetValueFromArray(logicArray, 3);
-            }
-            else
-            {
-                var DEBUG = true;
             }
 
             logicHg.AddTdcParam("Input1", logicHg.Input1);

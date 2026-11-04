@@ -11,9 +11,9 @@ namespace Honeywell.GUI.Mapper
     {
         public DbTdcCL CL { get; set; }
         public string FileName { get; set; }
-        public string TagName { get; set; }
-        public string PointType { get; set; }
-        public string Address { get; set; }
+        public string TagName { get; set; } = null!;
+        public string PointType { get; set; } = null!;
+        public string Address { get; set; } = null!;
 
         public CLAll(DbTdcCL dbCL, DbTdcTag? dbTdcTag)
         {

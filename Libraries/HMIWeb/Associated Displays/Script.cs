@@ -7,7 +7,7 @@ namespace Honeywell.HMIWeb
     {
         public string InnerHtml { get; set; }
         public string[] MatchReplacement { get; set; }
-        public Regex RegexScript { get; set; }
+        public Regex RegexScript { get; set; } = null!;
         public MatchCollection Matches { get; set; }
 
         public Script(string innerHtml)

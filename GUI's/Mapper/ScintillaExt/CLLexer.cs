@@ -41,7 +41,7 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
         private const int STATE_COMMENT = 4;
         private const int STATE_DIRECTIVE = 5;
 
-        public string AttachedPoint { get; set; }
+        public string AttachedPoint { get; set; } = null!;
         public static List<string> TdcTags { get; set; } = new List<string>();
         public static List<string> SampleTdcTags { get; set; } = new List<string>();
 

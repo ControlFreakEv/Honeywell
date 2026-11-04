@@ -299,7 +299,7 @@ namespace Honeywell.GUI.Mapper
             return Color.FromArgb(255, (byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb);
         }
 
-        private void ScintillaNet_MouseDown(object sender, MouseEventArgs e)
+        private void ScintillaNet_MouseDown(object? sender, MouseEventArgs e)
         {
             UpdateEbParameters(sender as Scintilla);
 
@@ -393,19 +393,19 @@ namespace Honeywell.GUI.Mapper
             IndicatorDict[RedToolStripTextBox.Text] = 4;
         }
 
-        private void ScintillaNet_DwellEnd(object sender, DwellEventArgs e)
+        private void ScintillaNet_DwellEnd(object? sender, DwellEventArgs e)
         {
             var scintilla = sender as Scintilla;
             if (scintilla != null)
                 scintilla.CallTipCancel();
         }
 
-        private void ScintillaNet_DwellStart(object sender, DwellEventArgs e)
+        private void ScintillaNet_DwellStart(object? sender, DwellEventArgs e)
         {
             UpdateTooltip(sender as Scintilla);
         }
 
-        private void ScintillaNet_KeyDown(object sender, KeyEventArgs e)
+        private void ScintillaNet_KeyDown(object? sender, KeyEventArgs e)
         {
             UpdateEbParameters(sender as Scintilla);
 
@@ -725,7 +725,7 @@ namespace Honeywell.GUI.Mapper
             ScintillaTextEditorCL.Text = prettyPrint;
         }
 
-        private void ScintillaTextEditorCL_TextChanged(object sender, EventArgs e)
+        private void ScintillaTextEditorCL_TextChanged(object? sender, EventArgs e)
         {
             CLDifferentFromOriginal();
         }

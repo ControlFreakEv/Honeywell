@@ -198,9 +198,6 @@
         public Zuby.ADGV.AdvancedDataGridView AdvancedDataGridView;
         private SplitContainer splitContainer1;
         private Zuby.ADGV.AdvancedDataGridViewSearchToolBar advancedDataGridViewSearchToolBar1;
-        private DataGridViewTextBoxColumn nodeDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private BindingSource tagsInCLBindingSource;
         private DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn pointTypeDataGridViewTextBoxColumn;

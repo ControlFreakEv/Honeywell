@@ -4,7 +4,7 @@ namespace Honeywell.GUI.Mapper
 {
     internal static class Program
     {
-        public static MainForm MainForm {  get; set; }
+        public static MainForm MainForm {  get; set; } = null!;
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -41,7 +41,7 @@ namespace Honeywell.GUI.Mapper
                     MainForm = new();
                 }
                 else
-                    throw ex;
+                    throw;
             }
 
             Application.Run(MainForm);

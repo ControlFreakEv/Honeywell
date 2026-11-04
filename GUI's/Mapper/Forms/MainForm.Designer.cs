@@ -286,15 +286,11 @@ namespace Honeywell.GUI.Mapper
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
         private ToolStrip toolStrip1;
         private ToolStripDropDownButton toolStripDropDownButton1;
-        private ToolStripMenuItem connectLocalToolStripMenuItem;
-        private ToolStripMenuItem connectServerToolStripMenuItem;
         private SplitContainer splitContainer1;
         private ToolStripMenuItem connectToolStripMenuItem;
         private ToolStripMenuItem MapHelpToolStripMenuItem;
         private ToolStripMenuItem ConnectLocalToolStripMenuItem;
         private ToolStripMenuItem ConnectServerToolStripMenuItem;
-        private ToolStripMenuItem _connectLocalToolStripMenuItem;
-        private ToolStripMenuItem _connectServerToolStripMenuItem;
         private ToolStripMenuItem importToolStripMenuItem;
         private ToolStripMenuItem exportToolStripMenuItem;
         private ToolStripDropDownButton toolStripDropDownButton2;

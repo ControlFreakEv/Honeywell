@@ -17,7 +17,7 @@ namespace Honeywell.GUI.Mapper.ScintillaExt
         public ScintillaTextEditor()
         {
             InitializeComponent();
-            this.TextChanged += (object sender, EventArgs e) => this.UpdateLineMargin();
+            this.TextChanged += (object? sender, EventArgs e) => this.UpdateLineMargin();
             this.UpdateLineMargin();
         }
 

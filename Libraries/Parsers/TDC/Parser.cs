@@ -9,7 +9,7 @@ using Honeywell.Parsers.TDC.Graphs;
 using Honeywell.TDC;
 using System.Data;
 using System.Data.OleDb;
-using Honeywell.Parsers.TDC.Logic;
+using System.Runtime.Versioning;
 using Honeywell.Database;
 using Honeywell.Parsers.TDC;
 //using Microsoft.VisualBasic.FileIO;
@@ -55,6 +55,7 @@ namespace Honeywell.Parsers.TDC
         public static string D3kEbFilePath { get; set; } = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Mapper.eb");
 
         //may need to repair "Microsoft Access Database Engine 2010" in add/remove programs
+        [SupportedOSPlatform("windows")]
         public static bool AddCdsFromD3kQuery(string password) //Z90
         {
             try
@@ -80,6 +81,7 @@ namespace Honeywell.Parsers.TDC
 
         }
 
+        [SupportedOSPlatform("windows")]
         public static void ImportFileRefsFromD3k(string filePath)
         {
             var connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Persist Security Info=False;";
@@ -155,6 +157,7 @@ namespace Honeywell.Parsers.TDC
         }
 
         //todo: suck out CDS and CL? tables may be locked
+        [SupportedOSPlatform("windows")]
         public static void CreateEBsFromD3K(string mdbFilePath, string? cdsCsvFilePath = null, string? hgIOCsvFilePath = null)
         {
             Dictionary<string,List<Tuple<string, string>>> cdsDict = new();
@@ -205,13 +208,9 @@ namespace Honeywell.Parsers.TDC
                 {
                     parameterDa.Fill(parameterDt);
                 }
-                catch (OleDbException ex)
+                catch (OleDbException)
                 {
                     continue; //spare points, not table for point type
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
                 }
 
                 DataTable? logicDt = null;

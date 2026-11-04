@@ -17,10 +17,10 @@ namespace Honeywell.Database
         public int NodeId { get; set; }
 
         [ImportAndExport(true, true)]
-        public string Parameter { get; set; }
+        public string Parameter { get; set; } = null!;
 
         [ImportAndExport(true, true)]
-        public string ConnectedNodeName { get; set; }
+        public string ConnectedNodeName { get; set; } = null!;
 
         [ImportAndExport(true, true)]
         public string? ConnectedNodeParameter { get; set; }

@@ -18,16 +18,16 @@ namespace Honeywell.Database
         public int TagId { get; set; }
 
         [ImportAndExport(true, true)]
-        public string FileType { get; set; }
+        public string FileType { get; set; } = null!;
 
         [ImportAndExport(true, true)]
-        public string Value { get; set; }
+        public string Value { get; set; } = null!;
 
         [ImportAndExport(true, true)]
         public bool DeleteOnImport { get; set; }
 
         [ImportAndExport(false, true)]
-        public virtual DbTdcTag Tag { get; set; }
+        public virtual DbTdcTag Tag { get; set; } = null!;
 
         public DbTdcFileRef()
         {
