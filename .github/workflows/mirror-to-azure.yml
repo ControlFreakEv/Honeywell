@@ -1,0 +1,42 @@
+name: Mirror to Azure DevOps
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  delete:
+  schedule:
+    - cron: '17 * * * *'   # hourly safety net
+  workflow_dispatch:
+
+concurrency:
+  group: mirror-to-azure
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch every GitHub branch and tag
+        run: |
+          git fetch --prune --tags origin '+refs/heads/*:refs/mirror/*'
+
+      - name: Push to Azure DevOps
+        env:
+          AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+          AZURE_URL: https://dev.azure.com/SeaconEngineering/Honeywell/_git/Honeywell
+        run: |
+          if [ -z "$AZURE_DEVOPS_PAT" ]; then
+            echo "::error::Secret AZURE_DEVOPS_PAT is not set"; exit 1
+          fi
+          AUTH=$(printf ':%s' "$AZURE_DEVOPS_PAT" | base64 -w0)
+          echo "::add-mask::$AUTH"
+          git -c http.extraheader="AUTHORIZATION: Basic $AUTH" \
+            push --force "$AZURE_URL" \
+              '+refs/mirror/*:refs/heads/*' \
+              '+refs/tags/*:refs/tags/*'
