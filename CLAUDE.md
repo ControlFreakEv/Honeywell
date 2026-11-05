@@ -11,4 +11,4 @@
   Actions → "Mirror to Azure DevOps" → Run workflow.
 - Auth: repository secret `AZURE_DEVOPS_PAT` (PAT needs **Code: Read & Write** scope).
 - Pushes are forced, so commits made directly in Azure will be overwritten. Make changes in GitHub only.
-- Branches deleted in GitHub are not deleted in Azure (no `--prune`).
+- Azure matches GitHub exactly (`--prune`): branches/tags deleted in GitHub, or created only in Azure, are deleted from Azure.
